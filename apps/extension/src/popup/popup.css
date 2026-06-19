@@ -1,0 +1,150 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  line-height: 1.4;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+  background: #0f1419;
+  color: #e7ecf3;
+}
+
+.panel {
+  padding: 16px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.tagline {
+  margin: 0 0 16px;
+  color: #9aa7b8;
+  font-size: 0.85rem;
+}
+
+.status-card {
+  background: #1a2332;
+  border: 1px solid #2a3648;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.status-card h2 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa7b8;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6b7280;
+}
+
+.indicator.connected .dot {
+  background: #22c55e;
+}
+
+.indicator.disconnected .dot {
+  background: #ef4444;
+}
+
+.indicator.unknown .dot {
+  background: #eab308;
+}
+
+.detail {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: #9aa7b8;
+}
+
+.setup-card,
+.troubleshoot-card {
+  background: #1a2332;
+  border: 1px solid #2a3648;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.setup-card h2,
+.troubleshoot-card h2 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa7b8;
+}
+
+.setup-list,
+.troubleshoot-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: #c5d0de;
+}
+
+.setup-list li {
+  margin-bottom: 8px;
+}
+
+.setup-list li strong {
+  display: block;
+  color: #e7ecf3;
+}
+
+.setup-list li.done strong {
+  color: #86efac;
+}
+
+.setup-list li span {
+  display: block;
+  color: #9aa7b8;
+  margin-top: 2px;
+}
+
+.troubleshoot-list li {
+  margin-bottom: 6px;
+}
+
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+a {
+  color: #93c5fd;
+  font-size: 0.85rem;
+}

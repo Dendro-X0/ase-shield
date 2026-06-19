@@ -1,0 +1,201 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  background: #f4f6f9;
+  color: #111827;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+header h1 {
+  margin: 0 0 8px;
+}
+
+header p {
+  margin: 0 0 24px;
+  color: #4b5563;
+}
+
+section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+section h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+code {
+  font-size: 0.9em;
+}
+
+.rule-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rules-list label:last-child {
+  border-bottom: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.hint {
+  color: #4b5563;
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+textarea {
+  width: 100%;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+#save-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#save-status {
+  color: #16a34a;
+  font-size: 0.9rem;
+}
+
+.export-actions {
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.field input,
+.field select,
+.field textarea {
+  font-family: inherit;
+}
+
+.link-btn {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.export-actions button,
+.incident-row button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.incident-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.incident-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.incident-row:last-child {
+  border-bottom: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rule-row {
+    border-bottom-color: #2a3648;
+  }
+
+  textarea {
+    background: #0f1419;
+    border-color: #374151;
+    color: #e7ecf3;
+  }
+
+  .hint {
+    color: #9aa7b8;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0f1419;
+    color: #e7ecf3;
+  }
+
+  header p {
+    color: #9aa7b8;
+  }
+
+  section {
+    background: #1a2332;
+    border-color: #2a3648;
+  }
+}

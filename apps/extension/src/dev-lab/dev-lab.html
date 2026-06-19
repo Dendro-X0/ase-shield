@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev Lab — Anti-SE Shield</title>
+    <link rel="stylesheet" href="./dev-lab.css" />
+  </head>
+  <body>
+    <main class="lab">
+      <header class="lab-header">
+        <div>
+          <p class="eyebrow">Experimental · local only</p>
+          <h1>Dev Lab</h1>
+          <p class="lede">
+            Simulated fraud threads and links. Nothing is sent to the network. Use this to prove the
+            rule engine catches high-risk patterns without hunting real scammers.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button id="run-all-btn" type="button" class="primary">Run all scenarios</button>
+          <a class="ghost-link" href="../options/options.html" target="_blank">Settings</a>
+        </div>
+      </header>
+
+      <section id="suite-summary" class="suite-summary hidden" aria-live="polite"></section>
+
+      <div class="lab-layout">
+        <aside class="scenario-list" id="scenario-list" aria-label="Scenarios"></aside>
+
+        <section class="scenario-stage">
+          <div id="platform-chrome" class="platform-chrome linkedin">
+            <div class="chrome-bar">
+              <span id="platform-label">LinkedIn</span>
+              <span id="category-label" class="category"></span>
+            </div>
+            <div class="thread-header">
+              <strong id="sender-label">—</strong>
+              <p id="scenario-subtitle" class="subtitle"></p>
+            </div>
+            <div id="message-thread" class="message-thread"></div>
+            <div id="link-fixtures" class="link-fixtures hidden"></div>
+          </div>
+
+          <div class="stage-actions">
+            <button id="run-scenario-btn" type="button" class="primary">Analyze this thread</button>
+            <p id="teaching-point" class="teaching"></p>
+          </div>
+
+          <section id="result-panel" class="result-panel hidden">
+            <h2>Analysis result</h2>
+            <p id="result-verdict" class="verdict"></p>
+            <ul id="result-rules" class="rules"></ul>
+            <p id="result-timeline" class="timeline hidden"></p>
+          </section>
+        </section>
+      </div>
+
+      <section class="panel link-lab">
+        <h2>Link inspector fixtures</h2>
+        <p class="hint">Hover or click to run local domain checks (same engine as on real sites).</p>
+        <ul id="global-link-fixtures" class="link-list"></ul>
+      </section>
+    </main>
+    <script type="module" src="./dev-lab.ts"></script>
+  </body>
+</html>

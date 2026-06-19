@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anti-SE Shield</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Anti-SE Shield</h1>
+      <p class="tagline">Local-first scam protection</p>
+
+      <section id="setup-section" class="setup-card" hidden>
+        <h2>Get started</h2>
+        <ol id="setup-list" class="setup-list"></ol>
+      </section>
+
+      <section class="status-card" aria-live="polite">
+        <h2>Companion</h2>
+        <div id="connection-indicator" class="indicator unknown">
+          <span class="dot"></span>
+          <span id="connection-label">Checking…</span>
+        </div>
+        <p id="connection-detail" class="detail"></p>
+      </section>
+
+      <section id="troubleshoot-section" class="troubleshoot-card" hidden>
+        <h2>Connection help</h2>
+        <ol id="troubleshoot-list" class="troubleshoot-list"></ol>
+      </section>
+
+      <footer>
+        <button id="refresh-btn" type="button">Check now</button>
+        <a id="dashboard-link" href="http://127.0.0.1:47123/" target="_blank" rel="noopener">Dashboard</a>
+        <a href="../dev-lab/dev-lab.html" target="_blank">Dev Lab</a>
+        <a href="../onboarding/onboarding.html" target="_blank">Tutorial</a>
+        <a href="../practice/practice.html" target="_blank">Practice</a>
+        <a href="../options/options.html" target="_blank">Settings</a>
+      </footer>
+    </main>
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>

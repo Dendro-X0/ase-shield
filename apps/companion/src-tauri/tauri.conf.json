@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Anti-SE Companion",
+  "version": "1.0.0-beta.1",
+  "identifier": "com.anti-se.companion",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Anti-SE Companion",
+        "width": 560,
+        "height": 720,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "Anti-SE",
+    "shortDescription": "Local quarantine, safe open, and recovery for Anti-SE Shield.",
+    "longDescription": "Windows companion for Anti-SE Shield: download quarantine, safe file opening, remote-session guard, and post-incident recovery. Talks to the browser extension over localhost only. No telemetry.",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-typecheck-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+  companion-rust:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/companion/src-tauri
+
+      - name: Install frontend deps and build UI
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter @ase/core build
+          pnpm --filter @ase/companion build
+
+      - name: Cargo check companion
+        working-directory: apps/companion/src-tauri
+        run: cargo check
+
+  companion-bundle:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/companion/src-tauri
+
+      - name: Install dependencies and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Build companion NSIS bundle
+        run: pnpm --filter @ase/companion tauri:build

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy policy — Anti-SE Shield</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+      }
+      body {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+        color: #111827;
+        background: #f9fafb;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #e5e7eb;
+          background: #0b1020;
+        }
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+      }
+      .meta {
+        color: #6b7280;
+        margin-bottom: 2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.95rem;
+      }
+      th,
+      td {
+        border: 1px solid #d1d5db;
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      @media (prefers-color-scheme: dark) {
+        th,
+        td {
+          border-color: #374151;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Privacy policy — Anti-SE Shield</h1>
+    <p class="meta"><strong>Effective:</strong> 2026-06-18 · Browser extension and Windows companion (public beta)</p>
+
+    <h2>Summary</h2>
+    <p>
+      Anti-SE Shield is <strong>local-first</strong>. We do <strong>not</strong> collect, transmit, or sell your
+      personal data. Analysis, incident logs, quarantine files, and recovery reports stay on your device unless
+      <strong>you</strong> choose to export or share them.
+    </p>
+
+    <h2>What runs on your device</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Where it stays</th>
+          <th>Shared by default?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Message text analyzed for scams</td>
+          <td>In browser memory during analysis</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Rule matches and risk levels</td>
+          <td>Extension UI + optional encrypted incident log</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Extension settings</td>
+          <td><code>chrome.storage.local</code></td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Download quarantine files</td>
+          <td>%LOCALAPPDATA%\Anti-SE Companion\quarantine\</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Companion ↔ extension IPC</td>
+          <td>127.0.0.1:47123 on localhost only</td>
+          <td>No</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>What we do not do</h2>
+    <ul>
+      <li>No analytics or telemetry SDKs</li>
+      <li>No crash reporting to third parties</li>
+      <li>No cloud sync of conversations, contacts, or files</li>
+      <li>No advertising or profiling</li>
+      <li>No sale of user data</li>
+    </ul>
+
+    <h2>Network access</h2>
+    <p>
+      The extension requests host permissions only for supported platforms (Gmail, LinkedIn, Upwork, WhatsApp Web,
+      Telegram Web) plus <strong>localhost</strong> for the companion app. Content scripts read page DOM locally; we
+      have no servers that receive user content.
+    </p>
+    <p>The companion app does not require internet access for core features.</p>
+
+    <h2>Permissions (store review)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>storage</code></td>
+          <td>Save settings and dismissals locally</td>
+        </tr>
+        <tr>
+          <td><code>downloads</code></td>
+          <td>Intercept risky downloads for companion quarantine</td>
+        </tr>
+        <tr>
+          <td><code>management</code></td>
+          <td>Extension inventory for recovery snapshot (user-initiated)</td>
+        </tr>
+        <tr>
+          <td>Host permissions</td>
+          <td>Content scripts on supported job/message platforms only</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Contact</h2>
+    <p>For privacy questions, open a GitHub issue in the project repository.</p>
+
+    <p class="meta">Source: <code>docs/PRIVACY.md</code> in the Anti-SE Shield repository.</p>
+  </body>
+</html>

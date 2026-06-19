@@ -1,0 +1,28 @@
+{
+  "name": "anti-social-engineering-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Local-first scam protection for freelancers and B2B professionals",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm --filter @ase/core build && pnpm --filter @ase/core --filter @ase/rules run test",
+    "dev:extension": "pnpm --filter @ase/extension dev",
+    "dev:companion": "pnpm --filter @ase/companion tauri:dev",
+    "dev:dashboard": "pnpm --filter @ase/dashboard dev",
+    "package:extension": "pnpm build && node scripts/package-extension.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1"
+  }
+}

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anti-SE Shield — Settings</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Anti-SE Shield Settings</h1>
+        <p>All analysis runs locally. No data is sent to external servers.</p>
+      </header>
+
+      <section>
+        <h2>Protection</h2>
+        <label class="row">
+          <input type="checkbox" id="overlays-enabled" checked />
+          Show in-page risk overlays on Gmail, LinkedIn, and Upwork
+        </label>
+      </section>
+
+      <section>
+        <h2>Rules</h2>
+        <p class="hint">Disable rules you do not want applied. Changes apply immediately.</p>
+        <div id="rules-list" class="rules-list"></div>
+      </section>
+
+      <section>
+        <h2>Trusted domains</h2>
+        <p class="hint">One domain per line (e.g. <code>clientcorp.com</code>). Link warnings are relaxed for these domains.</p>
+        <textarea id="allowlist" rows="5" placeholder="clientcorp.com"></textarea>
+      </section>
+
+      <section>
+        <h2>Job browser profile</h2>
+        <label class="row">
+          <input type="checkbox" id="job-browser-hint" checked />
+          Remind me to use a separate browser profile for client work
+        </label>
+        <p class="hint">
+          Keep personal email, banking, and passwords out of the same profile you use for unknown clients.
+          In Chrome/Edge: Settings → Profiles → Add profile.
+        </p>
+      </section>
+
+      <section>
+        <h2>Web dashboard</h2>
+        <p class="hint">Full status view in your browser (localhost only, companion must be running).</p>
+        <div class="export-actions">
+          <a class="link-btn" href="http://127.0.0.1:47123/" target="_blank" rel="noopener">Open dashboard</a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Getting started</h2>
+        <p class="hint">New to Anti-SE Shield? Walk through the tutorial and safe practice thread.</p>
+        <div class="export-actions">
+          <a class="link-btn" href="../onboarding/onboarding.html" target="_blank">Open tutorial</a>
+          <a class="link-btn" href="../dev-lab/dev-lab.html" target="_blank">Dev Lab</a>
+          <a class="link-btn" href="../practice/practice.html" target="_blank">Practice mode</a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Beta feedback</h2>
+        <p class="hint">
+          Report a false positive or missed scam. A markdown file is saved locally — nothing is sent
+          automatically. Attach the file only if you choose to email support.
+        </p>
+        <label class="field">
+          Report type
+          <select id="feedback-type">
+            <option value="false-positive">False positive (too aggressive)</option>
+            <option value="false-negative">False negative (missed a scam)</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="field">
+          Platform
+          <input id="feedback-platform" type="text" placeholder="linkedin, gmail, upwork…" />
+        </label>
+        <label class="field">
+          Thread summary
+          <textarea id="feedback-summary" rows="3" placeholder="Brief description of the conversation"></textarea>
+        </label>
+        <label class="field">
+          Expected level
+          <input id="feedback-expected" type="text" placeholder="safe, caution, high-risk" />
+        </label>
+        <label class="field">
+          Actual level
+          <input id="feedback-actual" type="text" placeholder="What the extension showed" />
+        </label>
+        <label class="field">
+          Rule IDs (optional)
+          <input id="feedback-rules" type="text" placeholder="R04, R05" />
+        </label>
+        <label class="field">
+          Notes
+          <textarea id="feedback-notes" rows="4"></textarea>
+        </label>
+        <label class="field">
+          Contact email (optional, only if you share the file)
+          <input id="feedback-email" type="email" placeholder="you@example.com" />
+        </label>
+        <div class="export-actions">
+          <button id="export-feedback-btn" type="button">Download feedback report</button>
+        </div>
+        <p id="feedback-status" class="hint" role="status"></p>
+      </section>
+
+      <section>
+        <h2>Incident export</h2>
+        <p class="hint">Download encrypted log entries as JSON and HTML for platform support or your records.</p>
+        <div class="export-actions">
+          <button id="export-all-btn" type="button">Export all incidents</button>
+        </div>
+        <ul id="incident-list" class="incident-list"></ul>
+        <p id="export-status" class="hint" role="status"></p>
+      </section>
+
+      <section>
+        <ul>
+          <li>No telemetry or analytics.</li>
+          <li>Companion uses localhost only (<code>127.0.0.1:47123</code>).</li>
+          <li>Incident log entries are encrypted in IndexedDB on this device.</li>
+        </ul>
+      </section>
+
+      <footer>
+        <button id="save-btn" type="button">Save settings</button>
+        <span id="save-status" role="status"></span>
+      </footer>
+    </main>
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practice mode — Anti-SE Shield</title>
+    <link rel="stylesheet" href="./practice.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <p class="eyebrow">Safe practice</p>
+        <h1>Fake scam thread</h1>
+        <p class="intro">
+          This is a safe, local-only example. Nothing is sent anywhere. Run analysis to see how the
+          extension would warn you on a real platform.
+        </p>
+      </header>
+
+      <section class="thread-card">
+        <p id="sender-label" class="sender"></p>
+        <div id="messages" class="messages"></div>
+        <button id="analyze-btn" type="button" class="primary">Analyze this thread</button>
+      </section>
+
+      <section id="result-section" class="result-card" hidden>
+        <h2>Analysis result</h2>
+        <p id="result-level" class="level"></p>
+        <ul id="result-rules" class="rules"></ul>
+        <p id="result-hint" class="hint"></p>
+        <button id="complete-btn" type="button" class="primary">Mark practice complete</button>
+      </section>
+    </main>
+    <script type="module" src="./practice.ts"></script>
+  </body>
+</html>
