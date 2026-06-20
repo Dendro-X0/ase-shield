@@ -6,6 +6,7 @@ import type { ExtensionSettings, IncidentRecord } from '../shared/types.js';
 const rulesList = document.getElementById('rules-list')!;
 const allowlistEl = document.getElementById('allowlist') as HTMLTextAreaElement;
 const overlaysEl = document.getElementById('overlays-enabled') as HTMLInputElement;
+const marketplaceOnlyEl = document.getElementById('marketplace-only-scan') as HTMLInputElement;
 const jobHintEl = document.getElementById('job-browser-hint') as HTMLInputElement;
 const saveBtn = document.getElementById('save-btn')!;
 const saveStatus = document.getElementById('save-status')!;
@@ -20,6 +21,7 @@ let loadedSettings: ExtensionSettings = {
   allowlistedDomains: [],
   showJobBrowserHint: true,
   overlaysEnabled: true,
+  marketplaceOnlyScan: true,
   onboardingCompleted: false,
   practiceCompleted: false,
 };
@@ -62,6 +64,7 @@ function collectSettings(): ExtensionSettings {
     allowlistedDomains: parseAllowlist(allowlistEl.value),
     showJobBrowserHint: jobHintEl.checked,
     overlaysEnabled: overlaysEl.checked,
+    marketplaceOnlyScan: marketplaceOnlyEl.checked,
     onboardingCompleted: loadedSettings.onboardingCompleted,
     practiceCompleted: loadedSettings.practiceCompleted,
   };
@@ -74,6 +77,7 @@ async function loadSettings(): Promise<void> {
 
   loadedSettings = settings;
   overlaysEl.checked = settings.overlaysEnabled;
+  marketplaceOnlyEl.checked = settings.marketplaceOnlyScan;
   jobHintEl.checked = settings.showJobBrowserHint;
   allowlistEl.value = settings.allowlistedDomains.join('\n');
   renderRules(new Set(settings.disabledRuleIds));

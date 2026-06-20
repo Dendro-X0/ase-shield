@@ -8,11 +8,12 @@
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm --filter @ase/core --filter @ase/rules build && pnpm -r run typecheck",
-    "test": "pnpm --filter @ase/core build && pnpm --filter @ase/core --filter @ase/rules run test",
+    "test": "pnpm --filter @ase/core build && pnpm --filter @ase/core --filter @ase/rules --filter @ase/extension run test",
     "dev:extension": "pnpm --filter @ase/extension dev",
     "dev:companion": "pnpm --filter @ase/companion tauri:dev",
     "dev:dashboard": "pnpm --filter @ase/dashboard dev",
-    "package:extension": "pnpm build && node scripts/package-extension.mjs"
+    "package:extension": "pnpm build && node scripts/package-extension.mjs",
+    "verify:release": "pnpm lint && pnpm typecheck && pnpm test && pnpm package:extension"
   },
   "engines": {
     "node": ">=20"

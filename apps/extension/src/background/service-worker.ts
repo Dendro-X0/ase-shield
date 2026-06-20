@@ -20,6 +20,7 @@ import {
 } from './analysis.js';
 import { registerDownloadListener, setActiveThread } from './downloads.js';
 import { runAllLabScenarios, runLabScenario } from './lab-runner.js';
+import { listenSelectionAnalyze, registerSelectionAnalyzeMenu } from './selection-analyze.js';
 import { syncThreadContextToCompanion } from './thread-context.js';
 import { dismissThread } from '../shared/dismissals.js';
 import { buildExportHtml, buildExportJson } from '../shared/export.js';
@@ -33,6 +34,7 @@ import {
 import type { BgRequest } from '../shared/types.js';
 
 chrome.runtime.onInstalled.addListener((details) => {
+  registerSelectionAnalyzeMenu();
   void loadLastPong().then(startPingLoop);
 
   if (details.reason === 'install') {
@@ -52,6 +54,7 @@ chrome.runtime.onStartup.addListener(() => {
 
 void loadLastPong().then(startPingLoop);
 registerDownloadListener();
+listenSelectionAnalyze();
 
 chrome.runtime.onMessage.addListener((message: BgRequest, _sender, sendResponse) => {
   const handle = async () => {

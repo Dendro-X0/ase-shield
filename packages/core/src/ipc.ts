@@ -1,4 +1,5 @@
 /** Localhost port for extension ↔ companion IPC (M0 dev transport). */
+import type { ExtensionSettingsSync } from './settings.js';
 import type { Platform } from './analysis.js';
 import type { ExtensionSnapshotPayload } from './recovery.js';
 import type { IncidentSyncPayload } from './dashboard.js';
@@ -9,6 +10,8 @@ export const COMPANION_IPC_ORIGIN = `http://127.0.0.1:${COMPANION_IPC_PORT}` as 
 
 /** Protocol version — bump when breaking IPC shape. */
 export const IPC_VERSION = 1 as const;
+
+export type { ExtensionSettingsSync } from './settings.js';
 
 export type IpcMessageType =
   | 'PING'
@@ -33,6 +36,8 @@ export interface PingPayload {
   source: 'extension';
   /** chrome.runtime.id — lets companion build extension page URLs for the dashboard. */
   extensionId?: string;
+  /** Current extension settings snapshot (synced to dashboard). */
+  settings?: ExtensionSettingsSync;
 }
 
 export interface PongPayload {
@@ -40,6 +45,8 @@ export interface PongPayload {
   companionVersion: string;
   pendingEvents?: SessionEventPayload[];
   requestExtensionSnapshot?: boolean;
+  /** Settings update queued from the dashboard; extension applies on next ping. */
+  pendingSettingsUpdate?: ExtensionSettingsSync;
 }
 
 export interface DownloadQueuedPayload {

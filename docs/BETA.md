@@ -1,11 +1,11 @@
-# Public beta — Anti-SE Shield 1.0.0-beta.2
+# Public beta — Anti-SE Shield 1.0.0-beta.3
 
-Welcome to the public beta. See [releases/v1.0.0-beta.2.md](releases/v1.0.0-beta.2.md) for GitHub Release notes.
+Welcome to the public beta. See [releases/v1.0.0-beta.3.md](releases/v1.0.0-beta.3.md) for GitHub Release notes.
 
 ## What’s included
 
-- **Extension** `1.0.0-beta.2` — scam pattern analysis, link guard, incident export, onboarding, practice mode, Dev Lab, feedback export
-- **Companion** `1.0.0-beta.2` — quarantine, safe open, remote session guard, recovery wizard, web dashboard (Windows 10/11)
+- **Extension** `1.0.0-beta.3` — universal scanner, marketplace-only default, selection analyze, Fiverr enricher, incident export, Dev Lab (9 scenarios)
+- **Companion** `1.0.0-beta.3` — quarantine, safe open, remote session guard, recovery wizard, shadcn dashboard (Windows 10/11)
 
 ## Install (early testers)
 
@@ -18,7 +18,7 @@ Welcome to the public beta. See [releases/v1.0.0-beta.2.md](releases/v1.0.0-beta
 
 Privacy policy: https://dendro-x0.github.io/ase-shield/privacy.html
 
-**Note:** Installer is unsigned in this beta (SmartScreen warning expected). Browser store listing deferred until dashboard UX pass.
+**Note:** Installer is unsigned in this beta (SmartScreen warning expected). Browser store listing uses broad HTTPS permission — see release notes.
 
 ### CI artifacts (alternative)
 

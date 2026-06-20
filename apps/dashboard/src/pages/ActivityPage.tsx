@@ -1,73 +1,55 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
-import { fetchActivity, formatTime, LEVEL_CLASS } from '../api.js';
-import type { DashboardActivity } from '@ase/core';
-
-const KIND_LABELS: Record<DashboardActivity['kind'], string> = {
-  thread_flagged: 'Thread',
-  download_quarantined: 'Download',
-  remote_session: 'Remote access',
-  incident: 'Incident',
-  practice: 'Practice demo',
-  lab_scenario: 'Dev lab',
-};
+import { fetchActivity } from '@/api';
+import { ActivityFeed } from '@/components/activity-feed';
+import { ConnectionIssueBanner } from '@/components/connection-issue-banner';
+import { EmptyState } from '@/components/empty-state';
+import { PageHeader, PageSkeleton } from '@/components/layout/page-header';
+import { SectionCard } from '@/components/section-card';
+import { useCompanionStatus } from '@/context/companion-status';
+import { usePoll } from '@/hooks/use-poll';
 
 export function ActivityPage() {
-  const [items, setItems] = useState<DashboardActivity[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    try {
-      setItems(await fetchActivity());
-      setError(null);
-    } catch {
-      setError('Companion not reachable.');
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-    const timer = setInterval(() => void refresh(), 5000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const fetchItems = useCallback(() => fetchActivity(), []);
+  const poll = usePoll(fetchItems, 5000);
+  const { extensionState } = useCompanionStatus();
 
   return (
     <>
-      <header className="page-head">
-        <div>
-          <h1>Activity</h1>
-          <p className="lede">Flagged threads, quarantined downloads, and remote-session events.</p>
-        </div>
-        <button type="button" className="ghost" onClick={() => void refresh()}>
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        title="Activity"
+        description="Flagged threads, quarantined downloads, and remote-session events."
+        onRefresh={() => void poll.refresh()}
+        refreshing={poll.refreshing}
+        lastUpdated={poll.lastUpdated}
+        loading={poll.loading && !poll.data}
+      />
 
-      {error && <div className="banner error">{error}</div>}
+      {poll.loading && !poll.data && <PageSkeleton rows={2} />}
 
-      <section className="panel">
-        {items.length === 0 ? (
-          <p className="empty">No recorded activity yet.</p>
-        ) : (
-          <ul className="feed feed-full">
-            {items.map((item) => (
-              <li key={item.id}>
-                <div className="feed-top">
-                  <span className="kind">{KIND_LABELS[item.kind]}</span>
-                  <strong>{item.title}</strong>
-                  {item.level && <span className={`pill ${LEVEL_CLASS[item.level]}`}>{item.level}</span>}
-                </div>
-                {item.detail && <p>{item.detail}</p>}
-                <p className="meta">
-                  {item.platform && <span>{item.platform}</span>}
-                  {item.threadId && <span className="mono">{item.threadId}</span>}
-                  <span>{formatTime(item.recordedAt)}</span>
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {poll.error || (extensionState != null && extensionState !== 'connected') ? (
+        <ConnectionIssueBanner
+          companionError={poll.error}
+          extensionState={poll.error ? null : extensionState ?? undefined}
+          onRetry={() => void poll.refresh()}
+        />
+      ) : null}
+
+      {(!poll.loading || poll.data) && (
+        <SectionCard
+          title="Event log"
+          description="All recorded activity from the extension and companion."
+        >
+          {!poll.data?.length ? (
+            <EmptyState
+              title="No recorded activity yet"
+              description="Run a practice scan or browse a supported platform to generate events."
+            />
+          ) : (
+            <ActivityFeed items={poll.data} showKind />
+          )}
+        </SectionCard>
+      )}
     </>
   );
 }

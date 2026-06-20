@@ -25,6 +25,9 @@ pub const IPC_VERSION: u32 = 1;
 pub struct IpcState {
     pub extension_last_ping_at: Option<i64>,
     pub extension_id: Option<String>,
+    pub extension_settings: Option<serde_json::Value>,
+    pub extension_settings_synced_at: Option<i64>,
+    pub pending_settings_update: Option<serde_json::Value>,
 }
 
 pub type SharedIpcState = Arc<Mutex<IpcState>>;
@@ -66,6 +69,8 @@ struct PongPayload {
     companion_version: String,
     pending_events: Vec<Value>,
     request_extension_snapshot: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pending_settings_update: Option<Value>,
 }
 
 #[derive(Serialize)]
@@ -136,6 +141,16 @@ async fn handle_ipc(
             {
                 inner.extension_id = Some(id.to_string());
             }
+            if let Some(settings) = envelope.payload.get("settings") {
+                inner.extension_settings = Some(settings.clone());
+                inner.extension_settings_synced_at = Some(chrono_now_ms());
+                if inner.pending_settings_update.is_some() {
+                    inner.pending_settings_update = None;
+                }
+            }
+
+            let pending_settings_update = inner.pending_settings_update.clone();
+            drop(inner);
 
             let pending_events: Vec<Value> = state
                 .remote_guard
@@ -167,6 +182,7 @@ async fn handle_ipc(
                 companion_version: env!("CARGO_PKG_VERSION").to_string(),
                 pending_events,
                 request_extension_snapshot,
+                pending_settings_update,
             })
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 

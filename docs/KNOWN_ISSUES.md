@@ -1,13 +1,14 @@
-# Known issues — public beta (1.0.0-beta.1)
+# Known issues — public beta (1.0.0-beta.3)
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 ## Extension
 
 | Issue | Impact | Workaround |
 |-------|--------|------------|
-| Platform DOM changes | Overlays may stop appearing on Gmail/LinkedIn/Upwork after site updates | Reload page; report via Settings → Beta feedback |
-| WhatsApp / Telegram | Link guard only; no full thread analysis | Use supported platforms for message-level warnings |
+| Universal scanner completeness | Some sites may miss message blocks until site hints are tuned | Right-click → Analyze selection; report site via Settings → Beta feedback |
+| Marketplace-only default | Forums, Discord web, etc. do not auto-scan until setting is changed | Options → disable “Freelance & B2B sites only” |
+| Broad host permission review | Chrome Web Store may delay approval for `https://*/*` | Sideload from GitHub Release zip for beta |
 | Firefox build | Experimental (`dist-firefox`); not store-listed in beta | Use Chrome or Edge for beta |
 | Practice mode | Does not appear on real LinkedIn; separate page only | Use popup → Practice |
 
@@ -24,7 +25,7 @@ Last updated: 2026-06-18
 
 | Issue | Impact | Workaround |
 |-------|--------|------------|
-| Store review pending | Extension not yet live on CWS/Edge | Install from store when listed; sideload only for developers |
+| Store review pending | Extension not yet live on CWS/Edge | Install from GitHub Release |
 | Code signing | Release builds unsigned until cert secrets configured | Run `scripts/sign-installer.ps1` after `tauri:build` when cert available |
 | First-run dashboard | Companion opens `/?welcome=1` once | Normal — follow setup checklist on Overview |
 

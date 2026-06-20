@@ -7,7 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
   package-extension:
+    needs: verify
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +51,6 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm build
-          pnpm test
 
       - name: Package extension zip
         run: pnpm package:extension
@@ -33,8 +60,10 @@ jobs:
         with:
           name: extension-zip
           path: dist/release/*.zip
+          if-no-files-found: error
 
   companion-bundle:
+    needs: verify
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,6 +107,7 @@ jobs:
         with:
           name: companion-installer
           path: apps/companion/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
 
   github-release:
     needs: [package-extension, companion-bundle]
@@ -86,14 +116,31 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
+      - name: Stage release assets and checksums
+        run: |
+          node scripts/stage-release-assets.mjs \
+            artifacts/extension-zip \
+            artifacts/companion-installer \
+            release-assets
+
+      - name: Verify release notes file
+        run: |
+          NOTES="docs/releases/${GITHUB_REF_NAME}.md"
+          if [ ! -f "$NOTES" ]; then
+            echo "::error::Missing release notes at $NOTES"
+            exit 1
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: docs/releases/${{ github.ref_name }}.md
+          fail_on_unmatched_files: true
           files: |
-            artifacts/extension-zip/*
-            artifacts/companion-installer/*
-          generate_release_notes: true
+            release-assets/*

@@ -1,5 +1,5 @@
 import {
-  CONNECTION_TROUBLESHOOTING,
+  connectionTroubleshootingSteps,
   DASHBOARD_URL,
   SETUP_CHECKLIST,
   type ConnectionState,
@@ -32,7 +32,7 @@ function renderTroubleshooting(show: boolean): void {
   if (!show) return;
 
   troubleshootList.replaceChildren(
-    ...CONNECTION_TROUBLESHOOTING.map((line) => {
+    ...connectionTroubleshootingSteps('extension-disconnected').map((line) => {
       const li = document.createElement('li');
       li.textContent = line;
       return li;

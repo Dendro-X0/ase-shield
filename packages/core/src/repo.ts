@@ -5,7 +5,7 @@ export const GITHUB_REPO = 'https://github.com/Dendro-X0/ase-shield' as const;
 export const GITHUB_PAGES_BASE = 'https://dendro-x0.github.io/ase-shield' as const;
 
 /** Current public beta release line. Bump with each GitHub Release tag. */
-export const RELEASE_VERSION = '1.0.0-beta.2' as const;
+export const RELEASE_VERSION = '1.0.0-beta.3' as const;
 
 export const GITHUB_RELEASES_URL = `${GITHUB_REPO}/releases` as const;
 

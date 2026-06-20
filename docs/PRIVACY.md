@@ -28,7 +28,9 @@ Anti-SE Shield is **local-first**. We do **not** collect, transmit, or sell your
 
 ## Network access
 
-The extension requests host permissions only for supported platforms (Gmail, LinkedIn, Upwork, WhatsApp Web, Telegram Web) plus **localhost** for the companion app. Content scripts read page DOM locally to detect threads and links; that content is not uploaded to our servers because **we have no servers** for user content.
+The extension requests **`https://*/*`** host permission so the universal scanner can read page text on HTTPS sites where scam conversations appear (marketplaces, email, forums, Discord web, etc.). It also requests **`http://127.0.0.1:47123/*`** for optional companion IPC on localhost. Content scripts read the DOM locally; that content is **not uploaded** to our servers because **we have no servers** for user content.
+
+Content scripts do not run on Chrome Web Store pages. They do not run on `chrome://` internal pages.
 
 The companion app does not require internet access for core features.
 
@@ -43,7 +45,8 @@ You may export incident logs, feedback reports, or recovery PDFs and send them t
 | `storage` | Save settings and dismissals locally |
 | `downloads` | Intercept risky downloads for companion quarantine |
 | `management` | Read installed extension list for recovery snapshot (companion M7) |
-| Host permissions | Run content scripts on supported job/message platforms only |
+| Host permissions (`https://*/*`) | Run the universal scanner on HTTPS pages where users read messages (local DOM read only) |
+| Host permissions (`127.0.0.1`) | Optional companion IPC on localhost |
 
 ## Data retention
 

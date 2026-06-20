@@ -2,7 +2,8 @@ import type { Platform } from '@ase/core';
 
 import { attachLinkInspector } from './link-inspector.js';
 import type { PlatformAdapter } from './platform-types.js';
-import { debounce } from './platform-types.js';
+
+export { createLinksOnlyAdapter as createLightAdapter } from '@ase/core';
 
 const CHIP_ID = 'ase-link-guard-chip';
 
@@ -66,27 +67,3 @@ function labelFor(platform: Platform): string {
   return platform;
 }
 
-export function createLightAdapter(
-  platform: Platform,
-  options: {
-    getThreadId: () => string | null;
-    getSenderHints: () => string[];
-    observeRoot: () => HTMLElement;
-  },
-): PlatformAdapter {
-  return {
-    platform,
-    mode: 'links-only',
-    getThreadId: options.getThreadId,
-    extractVisibleText: () => '',
-    getSenderHints: options.getSenderHints,
-    getMountTarget: () => document.body,
-    observe: (onChange) => {
-      const root = options.observeRoot();
-      const debounced = debounce(onChange, 600);
-      const observer = new MutationObserver(debounced);
-      observer.observe(root, { childList: true, subtree: true });
-      return () => observer.disconnect();
-    },
-  };
-}

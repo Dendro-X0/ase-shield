@@ -6,6 +6,7 @@ export interface ExtensionSettings {
   allowlistedDomains: string[];
   showJobBrowserHint: boolean;
   overlaysEnabled: boolean;
+  marketplaceOnlyScan: boolean;
   onboardingCompleted: boolean;
   practiceCompleted: boolean;
 }
@@ -15,6 +16,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   allowlistedDomains: [],
   showJobBrowserHint: true,
   overlaysEnabled: true,
+  marketplaceOnlyScan: true,
   onboardingCompleted: false,
   practiceCompleted: false,
 };

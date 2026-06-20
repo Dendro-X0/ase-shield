@@ -10,9 +10,11 @@ This document schedules work **after** the M8 public beta. Milestone history rem
 
 ## Vision (unchanged)
 
-Local-first protection for freelancers and B2B professionals: **warn before trust** (Phase 1 extension) and **contain after download** (Phase 2 companion). No telemetry, plain language, Windows-first.
+Local-first protection for freelancers and B2B professionals: **warn before trust** (Phase 1 extension) and **contain after download** (Phase 2 companion). No telemetry, plain language, Windows-first. **Freelance platforms are the primary wedge** (highest scam density in maintainer experience).
 
 **North-star UX:** A new user installs once, sees proof the shield works in under five minutes, and can configure everything from one familiar place.
+
+**Strategic framing:** [PRODUCT_VISION.md](PRODUCT_VISION.md) (use-case tiers, Obscur sibling relationship, non-goals).
 
 ---
 
@@ -199,5 +201,6 @@ gantt
 | [ROADMAP.md](ROADMAP.md) | M0–M8 milestone history |
 | [phases/PHASE_1_SHIP.md](phases/PHASE_1_SHIP.md) | Phase 1 execution checklist |
 | [THREAT_MODEL.md](THREAT_MODEL.md) | Scenario → feature mapping |
+| [PRODUCT_VISION.md](PRODUCT_VISION.md) | Strategic thesis, adapter tiers, Obscur mutual reference |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical boundaries |
 | [BETA.md](BETA.md) | Current beta install (sideload) |

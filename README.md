@@ -28,6 +28,7 @@ Local-first protection for freelancers, B2B professionals, and e-commerce operat
 |----------|---------|
 | [ROADMAP.md](docs/ROADMAP.md) | Phased delivery plan, milestones, acceptance criteria |
 | [PRODUCT_ROADMAP.md](docs/PRODUCT_ROADMAP.md) | Post-beta phases 1–4 (ship, UX, coverage, scale) |
+| [PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Strategic thesis, freelance-first wedge, mutual Obscur reference |
 | [phases/PHASE_1_SHIP.md](docs/phases/PHASE_1_SHIP.md) | Phase 1 ship-ready checklist |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Monorepo layout, boundaries, tech stack |
 | [THREAT_MODEL.md](docs/THREAT_MODEL.md) | Attack scenarios mapped to product features |
@@ -42,7 +43,7 @@ Local-first protection for freelancers, B2B professionals, and e-commerce operat
 
 ## Status
 
-**Public beta** — `1.0.0-beta.2`: [Latest release](https://github.com/Dendro-X0/ase-shield/releases/latest) · CI green · store listing after dashboard UX pass.
+**Public beta** — `1.0.0-beta.3`: [Latest release](https://github.com/Dendro-X0/ase-shield/releases/latest) · run `pnpm verify:release` before tagging
 
 **Next:** [Phase 1 — Ship-ready](docs/phases/PHASE_1_SHIP.md) (store listings, signed installer, consumer install path). Full schedule: [PRODUCT_ROADMAP.md](docs/PRODUCT_ROADMAP.md).
 

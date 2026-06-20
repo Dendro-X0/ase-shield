@@ -17,7 +17,11 @@
         <h2>Protection</h2>
         <label class="row">
           <input type="checkbox" id="overlays-enabled" checked />
-          Show in-page risk overlays on Gmail, LinkedIn, and Upwork
+          Show in-page risk overlays on HTTPS sites when automatic scanning is active.
+        </label>
+        <label class="row">
+          <input type="checkbox" id="marketplace-only-scan" checked />
+          Limit automatic scan to freelance &amp; B2B sites (Gmail, LinkedIn, Upwork, Fiverr, WhatsApp Web, Telegram Web, Freelancer.com). Right-click selection analyze still works on any page.
         </label>
       </section>
 
@@ -79,7 +83,7 @@
         </label>
         <label class="field">
           Platform
-          <input id="feedback-platform" type="text" placeholder="linkedin, gmail, upwork…" />
+          <input id="feedback-platform" type="text" placeholder="linkedin, gmail, upwork, fiverr…" />
         </label>
         <label class="field">
           Thread summary

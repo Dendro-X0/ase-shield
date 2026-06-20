@@ -24,12 +24,13 @@ export const EDGE_ADDONS_LISTING_URL =
 
 export const PRIVACY_POLICY_PATH = 'privacy.html' as const;
 
-export const CONNECTION_TROUBLESHOOTING = [
-  'Confirm Anti-SE Companion is running in the Windows system tray.',
-  `Open the dashboard at ${DASHBOARD_URL} — if the page does not load, restart the companion.`,
-  'In this popup, click Check now — status should show Connected within a few seconds.',
-  'If Windows Firewall prompted you, allow Anti-SE Companion on private networks.',
-] as const;
+export {
+  COMPANION_OFFLINE_STEPS,
+  CONNECTION_TROUBLESHOOTING,
+  connectionTroubleshootingSteps,
+  EXTENSION_DISCONNECTED_STEPS,
+  type ConnectionIssueKind,
+} from './connection.js';
 
 export interface OnboardingLink {
   label: string;

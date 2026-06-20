@@ -5,13 +5,16 @@ import {
   createIpcMessage,
   parseIpcMessage,
   type ConnectionState,
+  type ExtensionSettingsSync,
   type IpcMessage,
   type PongPayload,
 } from '@ase/core';
 
+import { getSettings } from './analysis.js';
 import { handleCompanionPendingEvents } from './thread-context.js';
 import { syncAllIncidentsToCompanion } from './incident-sync.js';
 import { sendExtensionSnapshot } from './recovery-snapshot.js';
+import { applySettingsSync, toSettingsSync } from '../shared/settings-sync.js';
 
 const STORAGE_KEY_LAST_PONG = 'companionLastPongAt';
 const PING_INTERVAL_MS = 3_000;
@@ -62,15 +65,20 @@ export async function sendIpcMessage(message: IpcMessage): Promise<IpcMessage | 
 }
 
 export async function pingCompanion(): Promise<void> {
+  const settings = toSettingsSync(await getSettings());
   const message = createIpcMessage('PING', {
     source: 'extension' as const,
     extensionId: chrome.runtime.id,
+    settings,
   });
   const response = await sendIpcMessage(message);
 
   if (response?.type === 'PONG') {
     await saveLastPong(Date.now());
     const payload = response.payload as PongPayload;
+    if (payload.pendingSettingsUpdate) {
+      await applySettingsSync(payload.pendingSettingsUpdate as ExtensionSettingsSync);
+    }
     await handleCompanionPendingEvents(payload.pendingEvents);
     if (payload.requestExtensionSnapshot) {
       await sendExtensionSnapshot();

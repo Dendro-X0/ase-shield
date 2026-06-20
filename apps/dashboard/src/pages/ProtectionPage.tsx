@@ -1,144 +1,230 @@
-import { useCallback, useEffect, useState } from 'react';
+import type { DashboardIncident } from '@ase/core';
+import { AlertCircle, AlertTriangle, CheckCircle2, Shield } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 import {
   fetchIncidents,
   fetchRemoteGuard,
   fetchSummary,
   formatTime,
-  LEVEL_CLASS,
   respondRemoteAlert,
   type RemoteGuardView,
-} from '../api.js';
-import type { DashboardIncident } from '@ase/core';
+} from '@/api';
+import {
+  ActionErrorAlert,
+  ConnectionIssueBanner,
+} from '@/components/connection-issue-banner';
+import { IncidentExportActions } from '@/components/incident-export-actions';
+import { EmptyState } from '@/components/empty-state';
+import { PageHeader, PageSkeleton } from '@/components/layout/page-header';
+import { RiskBadge } from '@/components/risk-badge';
+import { SectionCard } from '@/components/section-card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useCompanionStatus } from '@/context/companion-status';
+import { usePoll } from '@/hooks/use-poll';
+
+interface ProtectionData {
+  guard: RemoteGuardView;
+  incidents: DashboardIncident[];
+  sandboxAvailable: boolean;
+}
 
 export function ProtectionPage() {
-  const [guard, setGuard] = useState<RemoteGuardView | null>(null);
-  const [incidents, setIncidents] = useState<DashboardIncident[]>([]);
-  const [sandboxAvailable, setSandboxAvailable] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    try {
-      const [nextGuard, nextIncidents, summary] = await Promise.all([
-        fetchRemoteGuard(),
-        fetchIncidents(),
-        fetchSummary(),
-      ]);
-      setGuard(nextGuard);
-      setIncidents(nextIncidents);
-      setSandboxAvailable(summary.windowsSandboxAvailable);
-      setError(null);
-    } catch {
-      setError('Companion not reachable.');
-    }
+  const fetchProtection = useCallback(async (): Promise<ProtectionData> => {
+    const [guard, incidents, summary] = await Promise.all([
+      fetchRemoteGuard(),
+      fetchIncidents(),
+      fetchSummary(),
+    ]);
+    return {
+      guard,
+      incidents,
+      sandboxAvailable: summary.windowsSandboxAvailable,
+    };
   }, []);
 
-  useEffect(() => {
-    void refresh();
-    const timer = setInterval(() => void refresh(), 3000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const poll = usePoll(fetchProtection, 3000);
+  const { extensionState } = useCompanionStatus();
 
   async function handleRespond(action: 'end' | 'shield' | 'user_started'): Promise<void> {
-    if (!guard?.alert) return;
+    if (!poll.data?.guard.alert) return;
     setBusy(true);
+    setActionError(null);
     try {
-      await respondRemoteAlert(guard.alert.id, action);
-      await refresh();
+      await respondRemoteAlert(poll.data.guard.alert.id, action);
+      await poll.refresh();
     } catch (err) {
-      setError(String(err));
+      setActionError(String(err));
     } finally {
       setBusy(false);
     }
   }
 
+  const guard = poll.data?.guard;
+  const incidents = poll.data?.incidents ?? [];
+  const sandboxAvailable = poll.data?.sandboxAvailable ?? false;
+
   return (
     <>
-      <header className="page-head">
-        <div>
-          <h1>Protection</h1>
-          <p className="lede">Remote-session guard and synced incident log.</p>
-        </div>
-        <button type="button" className="ghost" onClick={() => void refresh()}>
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        title="Protection"
+        description="Remote-session guard and synced incident log."
+        onRefresh={() => void poll.refresh()}
+        refreshing={poll.refreshing}
+        lastUpdated={poll.lastUpdated}
+        loading={poll.loading && !poll.data}
+      />
 
-      {error && <div className="banner error">{error}</div>}
+      {poll.loading && !poll.data && <PageSkeleton rows={3} />}
 
-      <section className="panel">
-        <h2>Remote session guard</h2>
-        {guard?.alert ? (
-          <div className="alert-card">
-            <p className="alert-title">{guard.alert.toolLabel} detected</p>
-            <p>{guard.alert.message}</p>
-            <div className="actions">
-              <button type="button" className="primary" disabled={busy} onClick={() => void handleRespond('end')}>
-                End session
-              </button>
-              <button type="button" disabled={busy} onClick={() => void handleRespond('shield')}>
-                Continue with shield
-              </button>
-              <button type="button" disabled={busy} onClick={() => void handleRespond('user_started')}>
-                I started this
-              </button>
-            </div>
-          </div>
-        ) : (
-          <p className="empty">
-            No active remote-session prompt.
-            {guard?.runningRemoteTools.length ? ` Running: ${guard.runningRemoteTools.join(', ')}` : ''}
-          </p>
-        )}
+      {(poll.error || (extensionState != null && extensionState !== 'connected')) && (
+        <ConnectionIssueBanner
+          companionError={poll.error}
+          extensionState={poll.error ? null : extensionState ?? undefined}
+          onRetry={() => void poll.refresh()}
+        />
+      )}
 
-        {guard?.activeThread && (
-          <div className="thread-card">
-            <p>
-              Active flagged thread on <strong>{guard.activeThread.platform}</strong>
-              {guard.activeThread.senderLabel && ` — ${guard.activeThread.senderLabel}`}
-            </p>
-            <span className={`pill ${LEVEL_CLASS[guard.activeThread.level]}`}>
-              {guard.activeThread.level}
-            </span>
-          </div>
-        )}
+      {actionError && (
+        <ActionErrorAlert error={actionError} onDismiss={() => setActionError(null)} />
+      )}
 
-        {guard?.sensitiveWarning && (
-          <p className="sub">Sensitive app in foreground: {guard.sensitiveWarning.matchedLabel}</p>
-        )}
-      </section>
+      {(!poll.loading || poll.data) && (
+        <>
+          <SectionCard
+            title="Remote session guard"
+            description="Respond when remote-access tools are detected during a flagged conversation."
+          >
+            {guard?.alert ? (
+              <Alert variant="destructive">
+                <AlertTriangle className="size-4" />
+                <AlertTitle>{guard.alert.toolLabel} detected</AlertTitle>
+                <AlertDescription className="space-y-4">
+                  <p>{guard.alert.message}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" disabled={busy} onClick={() => void handleRespond('end')}>
+                      End session
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => void handleRespond('shield')}
+                    >
+                      Continue with shield
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => void handleRespond('user_started')}
+                    >
+                      I started this
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <EmptyState
+                title="No active remote-session prompt"
+                description={
+                  guard?.runningRemoteTools.length
+                    ? `Running: ${guard.runningRemoteTools.join(', ')}`
+                    : 'Remote-access tools will trigger a prompt here when detected.'
+                }
+              />
+            )}
 
-      <section className="panel">
-        <h2>Environment</h2>
-        <ul className="checklist">
-          <li>{sandboxAvailable ? 'Windows Sandbox available' : 'Windows Sandbox not available on this PC'}</li>
-          <li>{guard?.shieldActive ? 'Sensitive-app shield is on' : 'Sensitive-app shield is off'}</li>
-        </ul>
-      </section>
-
-      <section className="panel">
-        <h2>Incidents (from extension)</h2>
-        {incidents.length === 0 ? (
-          <p className="empty">No incidents synced yet. High-risk threads are logged in the extension and mirrored here.</p>
-        ) : (
-          <ul className="feed">
-            {incidents.map((item) => (
-              <li key={item.id}>
-                <div className="feed-top">
-                  <strong>{item.summary}</strong>
-                  <span className={`pill ${LEVEL_CLASS[item.level]}`}>{item.level}</span>
-                </div>
-                <p className="meta">
-                  <span>{item.platform}</span>
-                  <span>{item.ruleIds.join(', ')}</span>
-                  <span>{formatTime(item.recordedAt)}</span>
+            {guard?.activeThread && (
+              <div className="mt-4 rounded-lg border bg-muted/30 p-4">
+                <p className="text-sm">
+                  Active flagged thread on <strong>{guard.activeThread.platform}</strong>
+                  {guard.activeThread.senderLabel && ` — ${guard.activeThread.senderLabel}`}
                 </p>
+                <div className="mt-2">
+                  <RiskBadge level={guard.activeThread.level} />
+                </div>
+              </div>
+            )}
+
+            {guard?.sensitiveWarning && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                Sensitive app in foreground: {guard.sensitiveWarning.matchedLabel}
+              </p>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Environment">
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-sm">
+                {sandboxAvailable ? (
+                  <CheckCircle2 className="size-4 text-emerald-500" />
+                ) : (
+                  <AlertCircle className="size-4 text-muted-foreground" />
+                )}
+                {sandboxAvailable
+                  ? 'Windows Sandbox available'
+                  : 'Windows Sandbox not available on this PC'}
               </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              <li className="flex items-center gap-2 text-sm">
+                {guard?.shieldActive ? (
+                  <Shield className="size-4 text-emerald-500" />
+                ) : (
+                  <Shield className="size-4 text-muted-foreground" />
+                )}
+                {guard?.shieldActive ? 'Sensitive-app shield is on' : 'Sensitive-app shield is off'}
+              </li>
+            </ul>
+          </SectionCard>
+
+          <SectionCard
+            title="Incidents"
+            description="High-risk threads synced from the extension."
+            action={
+              incidents.length > 0 ? (
+                <IncidentExportActions disabled={Boolean(poll.error)} />
+              ) : undefined
+            }
+          >
+            {incidents.length === 0 ? (
+              <EmptyState
+                title="No incidents synced yet"
+                description="High-risk threads are logged in the extension and mirrored here."
+              />
+            ) : (
+              <ul className="divide-y">
+                {incidents.map((item) => (
+                  <li key={item.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium">{item.summary}</p>
+                          <RiskBadge level={item.level} />
+                        </div>
+                        <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                          <Badge variant="outline">{item.platform}</Badge>
+                          <span>{item.ruleIds.join(', ')}</span>
+                          <span>{formatTime(item.recordedAt)}</span>
+                        </p>
+                      </div>
+                      <IncidentExportActions
+                        incidentId={item.id}
+                        label="Export"
+                        disabled={Boolean(poll.error)}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </SectionCard>
+        </>
+      )}
     </>
   );
 }

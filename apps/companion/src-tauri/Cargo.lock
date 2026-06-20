@@ -69,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "ase-companion"
-version = "1.0.0-beta.1"
+version = "1.0.0-beta.2"
 dependencies = [
  "axum",
  "base64 0.22.1",

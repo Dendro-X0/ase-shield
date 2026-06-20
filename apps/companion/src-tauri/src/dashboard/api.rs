@@ -1,5 +1,5 @@
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
@@ -7,6 +7,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
+use crate::dashboard::export::build_incident_export;
 use crate::dashboard::DEV_LAB_PAGE_PATH;
 use crate::ipc::{IpcRouterState, IPC_PORT};
 use crate::quarantine::RiskLevel;
@@ -40,12 +41,80 @@ pub fn mount_api_routes() -> Router<IpcRouterState> {
         .route("/api/summary", get(api_summary))
         .route("/api/activity", get(api_activity))
         .route("/api/incidents", get(api_incidents))
+        .route("/api/incidents/export", get(api_incidents_export))
         .route("/api/quarantine", get(api_quarantine))
         .route("/api/remote-guard", get(api_remote_guard))
         .route("/api/quarantine/{id}/defer", post(api_defer))
         .route("/api/quarantine/{id}/delete", post(api_delete))
         .route("/api/quarantine/{id}/open-safely", post(api_open_safely))
         .route("/api/remote-guard/respond", post(api_remote_respond))
+        .route("/api/settings", get(api_settings).post(api_settings_save))
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SettingsResponse {
+    extension_connected: bool,
+    synced_at: Option<i64>,
+    pending_save: bool,
+    settings: Option<serde_json::Value>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SettingsSaveBody {
+    disabled_rule_ids: Vec<String>,
+    allowlisted_domains: Vec<String>,
+    show_job_browser_hint: bool,
+    overlays_enabled: bool,
+    marketplace_only_scan: bool,
+}
+
+async fn api_settings(State(state): State<IpcRouterState>) -> Json<SettingsResponse> {
+    let inner = state.ipc_state.lock().ok();
+    let (last_ping, synced_at, settings, pending_save) = inner
+        .as_ref()
+        .map(|ipc| {
+            (
+                ipc.extension_last_ping_at,
+                ipc.extension_settings_synced_at,
+                ipc.extension_settings.clone(),
+                ipc.pending_settings_update.is_some(),
+            )
+        })
+        .unwrap_or((None, None, None, false));
+
+    Json(SettingsResponse {
+        extension_connected: connection_state_from_last_ping(last_ping) == "connected",
+        synced_at,
+        pending_save,
+        settings,
+    })
+}
+
+async fn api_settings_save(
+    State(state): State<IpcRouterState>,
+    Json(body): Json<SettingsSaveBody>,
+) -> Result<StatusCode, StatusCode> {
+    let mut inner = state
+        .ipc_state
+        .lock()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let last_ping = inner.extension_last_ping_at;
+    if connection_state_from_last_ping(last_ping) != "connected" {
+        return Err(StatusCode::SERVICE_UNAVAILABLE);
+    }
+
+    inner.pending_settings_update = Some(serde_json::json!({
+        "disabledRuleIds": body.disabled_rule_ids,
+        "allowlistedDomains": body.allowlisted_domains,
+        "showJobBrowserHint": body.show_job_browser_hint,
+        "overlaysEnabled": body.overlays_enabled,
+        "marketplaceOnlyScan": body.marketplace_only_scan,
+    }));
+
+    Ok(StatusCode::ACCEPTED)
 }
 
 #[derive(Serialize)]
@@ -133,6 +202,27 @@ async fn api_activity(State(state): State<IpcRouterState>) -> Json<serde_json::V
 
 async fn api_incidents(State(state): State<IpcRouterState>) -> Json<serde_json::Value> {
     Json(serde_json::json!(state.dashboard.list_incidents()))
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct IncidentExportQuery {
+    id: Option<String>,
+}
+
+async fn api_incidents_export(
+    State(state): State<IpcRouterState>,
+    Query(query): Query<IncidentExportQuery>,
+) -> Result<Json<serde_json::Value>, StatusCode> {
+    let incidents = state.dashboard.list_incidents();
+    if query.id.as_ref().is_some_and(|id| !incidents.iter().any(|item| item.id == *id)) {
+        return Err(StatusCode::NOT_FOUND);
+    }
+
+    let export = build_incident_export(&incidents, query.id.as_deref());
+    Ok(Json(
+        serde_json::to_value(export).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+    ))
 }
 
 async fn api_quarantine(State(state): State<IpcRouterState>) -> Json<serde_json::Value> {

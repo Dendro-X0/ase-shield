@@ -140,6 +140,38 @@ We also need a quick identity check — use our secure payment portal instead of
     teachingPoint: 'Pressure to leave the platform removes escrow protection and audit trails.',
   },
   {
+    id: 'fiverr-off-platform-payment',
+    title: 'Pay outside Fiverr',
+    subtitle: 'Fiverr inbox thread',
+    platform: 'fiverr',
+    category: 'off-platform',
+    senderLabel: 'Buyer — new account',
+    messages: [
+      {
+        role: 'them',
+        text: 'Love your gig! Let us chat on WhatsApp so I can send the full brief faster.',
+      },
+      {
+        role: 'them',
+        text: 'Fiverr fees are too high — I will pay you directly via PayPal or USDT once you start.',
+      },
+    ],
+    analysis: {
+      text: `Love your gig! Let us chat on WhatsApp so I can send the full brief faster.
+
+Fiverr fees are too high — I will pay you directly via PayPal or USDT once you start.`,
+      messageChunks: [
+        'Love your gig! Let us chat on WhatsApp so I can send the full brief faster.',
+        'Fiverr fees are too high — I will pay you directly via PayPal or USDT once you start.',
+      ],
+      senderHints: ['Buyer — new account'],
+    },
+    expectedLevel: 'high-risk',
+    expectedRuleIds: ['R01', 'R05'],
+    teachingPoint:
+      'Buyers who push off-platform chat and direct payment bypass Fiverr protection and often disappear after delivery.',
+  },
+  {
     id: 'gmail-credential-phish',
     title: 'Urgent login verification',
     subtitle: 'Gmail thread with fake portal',

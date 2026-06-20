@@ -1,36 +1,35 @@
-import { useCallback, useEffect, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 import {
   deleteQuarantine,
   deferQuarantine,
   fetchQuarantine,
   formatTime,
-  LEVEL_CLASS,
   openSafely,
   type QuarantineRow,
-} from '../api.js';
+} from '@/api';
+import { ConnectionIssueBanner } from '@/components/connection-issue-banner';
+import { EmptyState } from '@/components/empty-state';
+import { PageHeader, PageSkeleton } from '@/components/layout/page-header';
+import { RiskBadge } from '@/components/risk-badge';
+import { SectionCard } from '@/components/section-card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { usePoll } from '@/hooks/use-poll';
+import { useCompanionStatus } from '@/context/companion-status';
 
 export function QuarantinePage() {
-  const [items, setItems] = useState<QuarantineRow[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    try {
-      const rows = await fetchQuarantine();
-      setItems(rows.filter((row) => row.status !== 'deferred'));
-      setError(null);
-    } catch {
-      setError('Companion not reachable.');
-    }
+  const fetchItems = useCallback(async (): Promise<QuarantineRow[]> => {
+    const rows = await fetchQuarantine();
+    return rows.filter((row) => row.status !== 'deferred');
   }, []);
 
-  useEffect(() => {
-    void refresh();
-    const timer = setInterval(() => void refresh(), 4000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const poll = usePoll(fetchItems, 4000);
+  const { extensionState } = useCompanionStatus();
 
   async function runAction(id: string, action: 'defer' | 'delete' | 'open'): Promise<void> {
     setBusyId(id);
@@ -42,7 +41,7 @@ export function QuarantinePage() {
         await openSafely(id);
         setMessage('Safe Workspace started in the companion app.');
       }
-      await refresh();
+      await poll.refresh();
     } catch (err) {
       setMessage(String(err));
     } finally {
@@ -52,76 +51,104 @@ export function QuarantinePage() {
 
   return (
     <>
-      <header className="page-head">
-        <div>
-          <h1>Quarantine</h1>
-          <p className="lede">Risky downloads held until you choose how to open them.</p>
-        </div>
-        <button type="button" className="ghost" onClick={() => void refresh()}>
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        title="Quarantine"
+        description="Risky downloads held until you choose how to open them."
+        onRefresh={() => void poll.refresh()}
+        refreshing={poll.refreshing}
+        lastUpdated={poll.lastUpdated}
+        loading={poll.loading && !poll.data}
+      />
 
-      {error && <div className="banner error">{error}</div>}
-      {message && <div className="banner info">{message}</div>}
+      {poll.loading && !poll.data && <PageSkeleton rows={2} />}
 
-      <section className="panel">
-        {items.length === 0 ? (
-          <p className="empty">Quarantine is empty. Flagged downloads from the browser appear here.</p>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>File</th>
-                  <th>Level</th>
-                  <th>Received</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.filename}</strong>
-                      {item.findings[0] && <p className="sub">{item.findings[0]}</p>}
-                    </td>
-                    <td>
-                      <span className={`pill ${LEVEL_CLASS[item.level]}`}>{item.level}</span>
-                    </td>
-                    <td>{formatTime(item.receivedAt)}</td>
-                    <td className="actions">
-                      <button
-                        type="button"
-                        className="primary"
-                        disabled={busyId === item.id}
-                        onClick={() => void runAction(item.id, 'open')}
-                      >
-                        Open safely
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busyId === item.id}
-                        onClick={() => void runAction(item.id, 'defer')}
-                      >
-                        Not now
-                      </button>
-                      <button
-                        type="button"
-                        className="danger"
-                        disabled={busyId === item.id}
-                        onClick={() => void runAction(item.id, 'delete')}
-                      >
-                        Delete
-                      </button>
-                    </td>
+      {(poll.error || (extensionState != null && extensionState !== 'connected')) && (
+        <ConnectionIssueBanner
+          companionError={poll.error}
+          extensionState={poll.error ? null : extensionState ?? undefined}
+          onRetry={() => void poll.refresh()}
+        />
+      )}
+
+      {message && (
+        <Alert variant="info">
+          <CheckCircle2 className="size-4" />
+          <AlertTitle>Action complete</AlertTitle>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
+      )}
+
+      {(!poll.loading || poll.data) && (
+        <SectionCard
+          title="Held downloads"
+          description="Flagged files from the browser extension. Open safely in an isolated workspace or remove them."
+        >
+          {!poll.data?.length ? (
+            <EmptyState
+              title="Quarantine is empty"
+              description="Flagged downloads from the browser appear here when the extension blocks a risky file."
+            />
+          ) : (
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/40 text-left">
+                    <th className="px-4 py-3 font-medium">File</th>
+                    <th className="px-4 py-3 font-medium">Level</th>
+                    <th className="px-4 py-3 font-medium">Received</th>
+                    <th className="px-4 py-3 font-medium">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {poll.data.map((item) => (
+                    <tr key={item.id} className="border-b last:border-0">
+                      <td className="px-4 py-3 align-top">
+                        <p className="font-medium">{item.filename}</p>
+                        {item.findings[0] && (
+                          <p className="mt-1 text-xs text-muted-foreground">{item.findings[0]}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <RiskBadge level={item.level} />
+                      </td>
+                      <td className="px-4 py-3 align-top text-muted-foreground">
+                        {formatTime(item.receivedAt)}
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            disabled={busyId === item.id}
+                            onClick={() => void runAction(item.id, 'open')}
+                          >
+                            Open safely
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busyId === item.id}
+                            onClick={() => void runAction(item.id, 'defer')}
+                          >
+                            Not now
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={busyId === item.id}
+                            onClick={() => void runAction(item.id, 'delete')}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </SectionCard>
+      )}
     </>
   );
 }

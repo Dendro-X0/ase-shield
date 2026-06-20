@@ -8,6 +8,8 @@ export function bootstrapPlatform(adapter: PlatformAdapter): void {
   let detachLinks: (() => void) | null = null;
 
   const scan = async () => {
+    if (adapter.prepare) await adapter.prepare();
+
     const text = adapter.extractVisibleText();
     if (!text || text.length < 20) {
       overlay.render(

@@ -2,8 +2,11 @@ import type {
   ConnectionState,
   DashboardActivity,
   DashboardIncident,
+  DashboardSettingsResponse,
   DashboardSetup,
   DashboardSummary,
+  ExtensionSettingsSync,
+  IncidentExportFiles,
   RiskLevel,
 } from '@ase/core';
 
@@ -31,6 +34,14 @@ export async function fetchIncidents(): Promise<DashboardIncident[]> {
   const response = await fetch(`${API}/api/incidents`);
   if (!response.ok) throw new Error('Failed to load incidents');
   return response.json() as Promise<DashboardIncident[]>;
+}
+
+export async function exportIncidents(incidentId?: string): Promise<IncidentExportFiles> {
+  const query = incidentId ? `?id=${encodeURIComponent(incidentId)}` : '';
+  const response = await fetch(`${API}/api/incidents/export${query}`);
+  if (response.status === 404) throw new Error('Incident not found.');
+  if (!response.ok) throw new Error('Failed to export incidents.');
+  return response.json() as Promise<IncidentExportFiles>;
 }
 
 export interface QuarantineRow {
@@ -101,6 +112,24 @@ export async function respondRemoteAlert(
   if (!response.ok) throw new Error('Response failed');
 }
 
+export async function fetchSettings(): Promise<DashboardSettingsResponse> {
+  const response = await fetch(`${API}/api/settings`);
+  if (!response.ok) throw new Error('Failed to load settings');
+  return response.json() as Promise<DashboardSettingsResponse>;
+}
+
+export async function saveSettings(settings: ExtensionSettingsSync): Promise<void> {
+  const response = await fetch(`${API}/api/settings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
+  });
+  if (response.status === 503) {
+    throw new Error('Extension not connected. Open the extension popup and wait for Connected.');
+  }
+  if (!response.ok) throw new Error('Failed to save settings');
+}
+
 export function formatTime(value: string): string {
   const asNumber = Number(value);
   const date = Number.isFinite(asNumber) ? new Date(asNumber) : new Date(value);
@@ -112,10 +141,4 @@ export const STATE_LABELS: Record<ConnectionState, string> = {
   connected: 'Extension connected',
   disconnected: 'Extension disconnected',
   unknown: 'Extension unknown',
-};
-
-export const LEVEL_CLASS: Record<RiskLevel, string> = {
-  safe: 'level-safe',
-  caution: 'level-caution',
-  'high-risk': 'level-high',
 };

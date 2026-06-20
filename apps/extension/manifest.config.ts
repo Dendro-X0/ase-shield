@@ -1,19 +1,24 @@
 import { defineManifest } from '@crxjs/vite-plugin';
 
+/** Universal scanner runs on HTTPS pages (forums, Discord web, marketplaces, etc.). */
+const UNIVERSAL_SCAN_MATCHES = ['https://*/*'];
+
+/** Store / browser surfaces where injection is unnecessary or disallowed. */
+const UNIVERSAL_SCAN_EXCLUDE = [
+  'https://chrome.google.com/*',
+  'https://chromewebstore.google.com/*',
+];
+
 export default defineManifest({
   manifest_version: 3,
   name: 'Anti-SE Shield',
-  version: '1.0.0-beta.2',
+  version: '1.0.0-beta.3',
   description:
     'Local-first protection against freelance and B2B scam patterns. No data leaves your device.',
-  permissions: ['storage', 'downloads', 'management'],
+  permissions: ['storage', 'downloads', 'management', 'contextMenus', 'scripting', 'activeTab'],
   host_permissions: [
     'http://127.0.0.1:47123/*',
-    'https://mail.google.com/*',
-    'https://www.linkedin.com/*',
-    'https://www.upwork.com/*',
-    'https://web.whatsapp.com/*',
-    'https://web.telegram.org/*',
+    'https://*/*',
   ],
   background: {
     service_worker: 'src/background/service-worker.ts',
@@ -29,28 +34,9 @@ export default defineManifest({
   },
   content_scripts: [
     {
-      matches: ['https://mail.google.com/*'],
-      js: ['src/content/entry-gmail.ts'],
-      run_at: 'document_idle',
-    },
-    {
-      matches: ['https://www.linkedin.com/*'],
-      js: ['src/content/entry-linkedin.ts'],
-      run_at: 'document_idle',
-    },
-    {
-      matches: ['https://www.upwork.com/*'],
-      js: ['src/content/entry-upwork.ts'],
-      run_at: 'document_idle',
-    },
-    {
-      matches: ['https://web.whatsapp.com/*'],
-      js: ['src/content/entry-whatsapp.ts'],
-      run_at: 'document_idle',
-    },
-    {
-      matches: ['https://web.telegram.org/*'],
-      js: ['src/content/entry-telegram.ts'],
+      matches: UNIVERSAL_SCAN_MATCHES,
+      exclude_matches: UNIVERSAL_SCAN_EXCLUDE,
+      js: ['src/content/entry-universal.ts'],
       run_at: 'document_idle',
     },
   ],

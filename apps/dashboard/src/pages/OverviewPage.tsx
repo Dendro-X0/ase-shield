@@ -1,226 +1,243 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-import { fetchActivity, fetchSetup, fetchSummary, formatTime, LEVEL_CLASS, STATE_LABELS } from '../api.js';
+import { PRACTICE_SCENARIO } from '@ase/core';
 import type { DashboardActivity, DashboardSetup, DashboardSummary } from '@ase/core';
-import {
-  CHROME_WEB_STORE_LISTING_URL,
-  COMPANION_DOWNLOAD_URL,
-  CONNECTION_TROUBLESHOOTING,
-  PRACTICE_SCENARIO,
-} from '@ase/core';
+import { AlertCircle, CheckCircle2, Circle } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
+
+import { fetchActivity, fetchSetup, fetchSummary, STATE_LABELS } from '@/api';
+import { ActivityFeed } from '@/components/activity-feed';
+import { ConnectionIssueBanner } from '@/components/connection-issue-banner';
+import { EmptyState } from '@/components/empty-state';
+import { PageHeader, PageSkeleton } from '@/components/layout/page-header';
+import { SectionCard } from '@/components/section-card';
+import { StatCard } from '@/components/stat-card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { useCompanionStatus } from '@/context/companion-status';
+import { usePoll } from '@/hooks/use-poll';
+
+interface OverviewData {
+  summary: DashboardSummary;
+  setup: DashboardSetup;
+  activity: DashboardActivity[];
+}
 
 export function OverviewPage() {
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [setup, setSetup] = useState<DashboardSetup | null>(null);
-  const [activity, setActivity] = useState<DashboardActivity[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const fetchOverview = useCallback(async (): Promise<OverviewData> => {
+    const [summary, activity, setup] = await Promise.all([
+      fetchSummary(),
+      fetchActivity(),
+      fetchSetup(),
+    ]);
+    return { summary, setup, activity: activity.slice(0, 8) };
+  }, []);
+
+  const poll = usePoll(
+    fetchOverview,
+    4000,
+    'Start the Anti-SE Companion on this PC, then reload this page.',
+  );
 
   const isWelcome = useMemo(
     () => new URLSearchParams(window.location.search).get('welcome') === '1',
     [],
   );
 
-  const refresh = useCallback(async () => {
-    try {
-      const [nextSummary, nextActivity, nextSetup] = await Promise.all([
-        fetchSummary(),
-        fetchActivity(),
-        fetchSetup(),
-      ]);
-      setSummary(nextSummary);
-      setSetup(nextSetup);
-      setActivity(nextActivity.slice(0, 8));
-      setError(null);
-    } catch {
-      setError('Start the Anti-SE Companion on this PC, then reload this page.');
-      setSummary(null);
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-    const timer = setInterval(() => {
-      void refresh();
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const summary = poll.data?.summary ?? null;
+  const setup = poll.data?.setup ?? null;
+  const activity = poll.data?.activity ?? [];
+  const { extensionState } = useCompanionStatus();
 
   return (
     <>
-      <header className="page-head">
-        <div>
-          <h1>Overview</h1>
-          <p className="lede">Live status from your extension and Windows companion.</p>
-        </div>
-        <button type="button" className="ghost" onClick={() => void refresh()}>
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        title="Overview"
+        description="Live status from your extension and Windows companion."
+        onRefresh={() => void poll.refresh()}
+        refreshing={poll.refreshing}
+        lastUpdated={poll.lastUpdated}
+        loading={poll.loading && !poll.data}
+      />
 
-      {error && <div className="banner error">{error}</div>}
+      {poll.loading && !poll.data && <PageSkeleton rows={4} />}
 
-      {isWelcome && (
-        <div className="banner info">
-          <strong>Welcome to Anti-SE Shield.</strong> Install the browser extension from the store, run
-          practice mode once, and confirm a high-risk row appears in Recent activity below.
-        </div>
-      )}
+      {poll.error || (extensionState != null && extensionState !== 'connected') ? (
+        <ConnectionIssueBanner
+          companionError={poll.error}
+          extensionState={poll.error ? null : extensionState}
+          onRetry={() => void poll.refresh()}
+        />
+      ) : null}
 
-      {summary && summary.extensionState !== 'connected' && (
-        <section className="panel troubleshoot-panel">
-          <h2>Extension not connected</h2>
-          <ol className="troubleshoot-steps">
-            {CONNECTION_TROUBLESHOOTING.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ol>
-          <p className="setup-lab">
-            <a href={CHROME_WEB_STORE_LISTING_URL} target="_blank" rel="noreferrer">
-              Chrome Web Store
-            </a>
-            {' · '}
-            <a href={COMPANION_DOWNLOAD_URL} target="_blank" rel="noreferrer">
-              Companion installer
-            </a>
-          </p>
-        </section>
-      )}
-
-      {setup && !setup.hasPracticeScan && (
-        <section className="panel setup-panel">
-          <h2>See it work in 2 minutes</h2>
-          <p className="lede">{setup.practiceScenario || PRACTICE_SCENARIO}</p>
-          <ol className="setup-steps">
-            <li className={setup.extensionConnected ? 'done' : 'pending'}>
-              <strong>Extension connected</strong>
-              <span>
-                {setup.extensionConnected
-                  ? 'Popup shows Connected.'
-                  : 'Install the extension from the store, then open the popup → Check now.'}
-              </span>
-            </li>
-            <li className={setup.hasPracticeScan ? 'done' : 'pending'}>
-              <strong>Run practice scan</strong>
-              <span>Extension popup → Practice → Analyze this thread.</span>
-            </li>
-            <li className={setup.hasActivity ? 'done' : 'pending'}>
-              <strong>Proof on this page</strong>
-              <span>A high-risk practice row appears in Recent activity below.</span>
-            </li>
-          </ol>
-          <p className="setup-next">
-            <strong>Next:</strong> {setup.recommendedNext}
-          </p>
-          {setup.devLabUrl ? (
-            <p className="setup-lab">
-              <strong>Want more scenarios?</strong>{' '}
-              <a href={setup.devLabUrl} target="_blank" rel="noreferrer">
-                Open Dev Lab
-              </a>{' '}
-              — simulated fraud threads and a regression suite, no real scammers required.
-            </p>
-          ) : (
-            <p className="setup-lab muted">
-              <strong>Dev Lab:</strong> connect the extension first; a direct link appears here.
-            </p>
+      {!poll.loading || poll.data ? (
+        <>
+          {isWelcome && (
+            <Alert variant="info">
+              <AlertCircle className="size-4" />
+              <AlertTitle>Welcome to Anti-SE Shield</AlertTitle>
+              <AlertDescription>
+                Install the browser extension from the store, run practice mode once, and confirm a
+                high-risk row appears in Recent activity below.
+              </AlertDescription>
+            </Alert>
           )}
-        </section>
-      )}
 
-      {setup?.hasPracticeScan && (
-        <div className="banner info">
-          Practice scan recorded — the shield flagged remote-access and payment-bypass patterns. On real
-          sites, the same analysis runs on your conversations automatically.
-        </div>
-      )}
-
-      {summary && (
-        <section className="stat-grid">
-          <StatCard
-            label="Extension"
-            value={STATE_LABELS[summary.extensionState]}
-            tone={summary.extensionState === 'connected' ? 'good' : 'warn'}
-          />
-          <StatCard label="Quarantine" value={String(summary.quarantineCount)} tone="neutral" />
-          <StatCard label="Incidents" value={String(summary.incidentCount)} tone="neutral" />
-          <StatCard
-            label="Remote shield"
-            value={summary.remoteShieldActive ? 'Active' : 'Off'}
-            tone={summary.remoteShieldActive ? 'good' : 'neutral'}
-          />
-        </section>
-      )}
-
-      <section className="panel">
-        <div className="panel-head">
-          <h2>Recent activity</h2>
-          <span className="muted">{summary ? `v${summary.companionVersion}` : ''}</span>
-        </div>
-
-        {activity.length === 0 ? (
-          <div className="empty-block">
-            <p className="empty">No activity yet.</p>
-            {!setup?.hasPracticeScan && (
-              <p className="empty-hint">
-                Fastest proof: extension popup → <strong>Practice</strong> → Analyze (companion must be
-                running).
+          {setup && !setup.hasPracticeScan && (
+            <SectionCard
+              title="See it work in 2 minutes"
+              description={setup.practiceScenario || PRACTICE_SCENARIO}
+            >
+              <ul className="space-y-3">
+                <SetupStep
+                  done={setup.extensionConnected}
+                  title="Extension connected"
+                  detail={
+                    setup.extensionConnected
+                      ? 'Popup shows Connected.'
+                      : 'Install the extension from the store, then open the popup → Check now.'
+                  }
+                />
+                <SetupStep
+                  done={setup.hasPracticeScan}
+                  title="Run practice scan"
+                  detail="Extension popup → Practice → Analyze this thread."
+                />
+                <SetupStep
+                  done={setup.hasActivity}
+                  title="Proof on this page"
+                  detail="A high-risk practice row appears in Recent activity below."
+                />
+              </ul>
+              <p className="mt-4 text-sm">
+                <span className="font-medium">Next:</span> {setup.recommendedNext}
               </p>
-            )}
-          </div>
-        ) : (
-          <ul className="feed">
-            {activity.map((item) => (
-              <li key={item.id}>
-                <div className="feed-top">
-                  <strong>{item.title}</strong>
-                  {item.level && <span className={`pill ${LEVEL_CLASS[item.level]}`}>{item.level}</span>}
-                </div>
-                {item.detail && <p>{item.detail}</p>}
-                <p className="meta">
-                  {item.platform && <span>{item.platform}</span>}
-                  <span>{formatTime(item.recordedAt)}</span>
+              {setup.devLabUrl ? (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Want more scenarios?</span>{' '}
+                  <a
+                    href={setup.devLabUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    Open Dev Lab
+                  </a>{' '}
+                  — simulated fraud threads and a regression suite, no real scammers required.
                 </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="panel hint-panel">
-        <h2>How to use this dashboard</h2>
-        <ul>
-          <li>Keep the companion running in the system tray while you work.</li>
-          <li>Use the extension badge on conversations for live warnings.</li>
-          <li>Review quarantined downloads here before opening files.</li>
-          <li>Respond to remote-session alerts from the Protection page.</li>
-          {setup?.devLabUrl && (
-            <li>
-              Run simulated fraud scenarios in the{' '}
-              <a href={setup.devLabUrl} target="_blank" rel="noreferrer">
-                Dev Lab
-              </a>{' '}
-              (extension page).
-            </li>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Dev Lab:</span> connect the extension
+                  first; a direct link appears here.
+                </p>
+              )}
+            </SectionCard>
           )}
-        </ul>
-      </section>
+
+          {setup?.hasPracticeScan && (
+            <Alert variant="info">
+              <CheckCircle2 className="size-4" />
+              <AlertTitle>Practice scan recorded</AlertTitle>
+              <AlertDescription>
+                The shield flagged remote-access and payment-bypass patterns. On real sites, the same
+                analysis runs on your conversations automatically.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {summary && (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatCard
+                label="Extension"
+                value={STATE_LABELS[summary.extensionState]}
+                tone={summary.extensionState === 'connected' ? 'good' : 'warn'}
+              />
+              <StatCard label="Quarantine" value={String(summary.quarantineCount)} tone="neutral" />
+              <StatCard label="Incidents" value={String(summary.incidentCount)} tone="neutral" />
+              <StatCard
+                label="Remote shield"
+                value={summary.remoteShieldActive ? 'Active' : 'Off'}
+                tone={summary.remoteShieldActive ? 'good' : 'neutral'}
+              />
+            </div>
+          )}
+
+          <SectionCard
+            title="Recent activity"
+            description="Latest events from the extension and companion."
+            action={
+              summary ? (
+                <Badge variant="outline" className="font-normal">
+                  v{summary.companionVersion}
+                </Badge>
+              ) : undefined
+            }
+          >
+            {activity.length === 0 ? (
+              <EmptyState
+                title="No activity yet"
+                description={
+                  !setup?.hasPracticeScan
+                    ? 'Extension popup → Practice → Analyze (companion must be running).'
+                    : undefined
+                }
+              />
+            ) : (
+              <ActivityFeed items={activity} />
+            )}
+          </SectionCard>
+
+          <SectionCard title="How to use this dashboard">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>Keep the companion running in the system tray while you work.</li>
+              <li>Use the extension badge on conversations for live warnings.</li>
+              <li>Review quarantined downloads here before opening files.</li>
+              <li>Respond to remote-session alerts from the Protection page.</li>
+              {setup?.devLabUrl && (
+                <li>
+                  Run simulated fraud scenarios in the{' '}
+                  <a
+                    href={setup.devLabUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    Dev Lab
+                  </a>{' '}
+                  (extension page).
+                </li>
+              )}
+            </ul>
+          </SectionCard>
+        </>
+      ) : null}
     </>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  tone,
+function SetupStep({
+  done,
+  title,
+  detail,
 }: {
-  label: string;
-  value: string;
-  tone: 'good' | 'warn' | 'neutral';
+  done: boolean;
+  title: string;
+  detail: string;
 }) {
+  const Icon = done ? CheckCircle2 : Circle;
+
   return (
-    <article className={`stat stat-${tone}`}>
-      <p className="stat-label">{label}</p>
-      <p className="stat-value">{value}</p>
-    </article>
+    <li className="flex gap-3">
+      <Icon
+        className={
+          done
+            ? 'mt-0.5 size-5 shrink-0 text-emerald-500'
+            : 'mt-0.5 size-5 shrink-0 text-muted-foreground'
+        }
+        aria-hidden="true"
+      />
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-sm text-muted-foreground">{detail}</p>
+      </div>
+    </li>
   );
 }
