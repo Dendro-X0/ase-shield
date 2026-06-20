@@ -1,6 +1,11 @@
-# Anti–Social Engineering Workspace
+# Anti-SE Shield
 
 Local-first protection for freelancers, B2B professionals, and e-commerce operators who face two-phase scam attacks: **social engineering** (Phase 1) and **technical exploitation** (Phase 2).
+
+**Repository:** [github.com/Dendro-X0/ase-shield](https://github.com/Dendro-X0/ase-shield)  
+**Privacy policy (hosted):** [dendro-x0.github.io/ase-shield/privacy.html](https://dendro-x0.github.io/ase-shield/privacy.html)
+
+[![CI](https://github.com/Dendro-X0/ase-shield/actions/workflows/ci.yml/badge.svg)](https://github.com/Dendro-X0/ase-shield/actions/workflows/ci.yml)
 
 ## Principles
 
@@ -42,6 +47,10 @@ Local-first protection for freelancers, B2B professionals, and e-commerce operat
 **Next:** [Phase 1 — Ship-ready](docs/phases/PHASE_1_SHIP.md) (store listings, signed installer, consumer install path). Full schedule: [PRODUCT_ROADMAP.md](docs/PRODUCT_ROADMAP.md).
 
 See [BETA.md](docs/BETA.md) to install (sideload) and [DEVELOPMENT.md](docs/DEVELOPMENT.md) to run from source.
+
+## CI
+
+Push to `main` runs lint, build, tests, packages the extension zip, builds the NSIS installer, and publishes the privacy policy to GitHub Pages. Download build artifacts from the [Actions](https://github.com/Dendro-X0/ase-shield/actions) tab. Tag `v*` for a [GitHub Release](https://github.com/Dendro-X0/ase-shield/releases).
 
 ## Development platform
 

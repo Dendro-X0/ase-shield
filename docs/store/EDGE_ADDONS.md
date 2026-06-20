@@ -6,7 +6,7 @@ Edge Add-ons uses the same Chromium extension package as Chrome. Follow [CHROME_
 
 1. Sign in to [Partner Center — Edge Add-ons](https://partner.microsoft.com/dashboard/microsoftedge/overview).
 2. Submit the same `apps/extension/dist` folder (zip) built at version `1.0.0-beta.1`.
-3. **Privacy policy URL:** same as Chrome — [PRIVACY.md](../PRIVACY.md) hosted or GitHub raw link.
+3. **Privacy policy URL:** https://dendro-x0.github.io/ase-shield/privacy.html (see [PRIVACY_HOSTING.md](./PRIVACY_HOSTING.md))
 4. **Data collection:** select **No personal data collected** where applicable.
 5. **Permissions justification:** paste the permissions table from [PRIVACY.md](../PRIVACY.md).
 

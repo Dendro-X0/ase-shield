@@ -1,4 +1,13 @@
 import { DASHBOARD_URL } from './dashboard.js';
+import { COMPANION_DOWNLOAD_URL, PRIVACY_POLICY_URL } from './repo.js';
+
+export {
+  COMPANION_DOWNLOAD_URL,
+  GITHUB_REPO,
+  GITHUB_PAGES_BASE,
+  GITHUB_ISSUES_URL,
+  PRIVACY_POLICY_URL,
+} from './repo.js';
 
 /** Update when Chrome Web Store listing is approved. */
 export const CHROME_WEB_STORE_LISTING_URL =
@@ -8,18 +17,7 @@ export const CHROME_WEB_STORE_LISTING_URL =
 export const EDGE_ADDONS_LISTING_URL =
   'https://microsoftedge.microsoft.com/addons/search/anti-se%20shield' as const;
 
-/**
- * Update when GitHub Releases or download page is live.
- * Placeholder points at releases path pattern.
- */
-export const COMPANION_DOWNLOAD_URL =
-  'https://github.com/anti-se/anti-social-engineering-workspace/releases/latest' as const;
-
 export const PRIVACY_POLICY_PATH = 'privacy.html' as const;
-
-/** Public URL for store listings — update when GitHub Pages or site is live. */
-export const PRIVACY_POLICY_URL =
-  'https://github.com/anti-se/anti-social-engineering-workspace/blob/main/docs/privacy.html' as const;
 
 export const CONNECTION_TROUBLESHOOTING = [
   'Confirm Anti-SE Companion is running in the Windows system tray.',

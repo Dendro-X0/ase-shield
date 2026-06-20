@@ -5,9 +5,15 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint-typecheck-build:
+  verify:
+    name: Lint, build, test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +42,20 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Package extension zip
+        if: github.event_name != 'pull_request'
+        run: pnpm package:extension
+
+      - name: Upload extension zip
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: dist/release/*.zip
+          retention-days: 30
+
   companion-rust:
+    name: Cargo check
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,18 +75,21 @@ jobs:
         with:
           workspaces: apps/companion/src-tauri
 
-      - name: Install frontend deps and build UI
+      - name: Build companion frontend
         run: |
           pnpm install --frozen-lockfile
           pnpm --filter @ase/core build
           pnpm --filter @ase/companion build
 
-      - name: Cargo check companion
+      - name: Cargo check
         working-directory: apps/companion/src-tauri
         run: cargo check
 
   companion-bundle:
+    name: NSIS installer
     runs-on: windows-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: [verify]
     steps:
       - uses: actions/checkout@v4
 
@@ -86,10 +108,47 @@ jobs:
         with:
           workspaces: apps/companion/src-tauri
 
-      - name: Install dependencies and build
+      - name: Install and build
         run: |
           pnpm install --frozen-lockfile
           pnpm build
 
       - name: Build companion NSIS bundle
         run: pnpm --filter @ase/companion tauri:build
+
+      - name: Upload companion installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-installer
+          path: apps/companion/src-tauri/target/release/bundle/nsis/*.exe
+          retention-days: 30
+
+  deploy-pages:
+    name: Privacy policy (GitHub Pages)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: [verify]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          cp docs/privacy.html _site/index.html
+          cp docs/privacy.html _site/privacy.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

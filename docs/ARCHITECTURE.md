@@ -41,7 +41,7 @@ Local-first monorepo for Phase 1 (browser extension) and Phase 2 (Windows compan
 ## Monorepo layout (target)
 
 ```
-anti-social-engineering-workspace/
+ase-shield/
 ├── apps/
 │   ├── extension/          # Chrome/Edge/Firefox MV3
 │   │   ├── src/

@@ -29,7 +29,7 @@ Use this checklist when submitting **Anti-SE Shield** extension v`1.0.0-beta.1`.
 | Certify limited use | Yes — local analysis only; no remote logging |
 | Privacy policy URL | Link to `docs/PRIVACY.md` on GitHub (or hosted copy) |
 
-Attach [PRIVACY.md](../PRIVACY.md) content or publish the same text at a stable URL before submission. See [PRIVACY_HOSTING.md](./PRIVACY_HOSTING.md).
+Attach [PRIVACY.md](../PRIVACY.md) or use the hosted URL: **https://dendro-x0.github.io/ase-shield/privacy.html**
 
 ## Permissions notes for reviewers
 

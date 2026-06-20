@@ -11,7 +11,7 @@ Welcome to the first public beta. This release completes roadmap milestones M0�
 
 ### Consumer path (Phase 1 target)
 
-1. Download **Anti-SE Companion** installer from [GitHub Releases](https://github.com/anti-se/anti-social-engineering-workspace/releases) (signed when certificate is configured).
+1. Download **Anti-SE Companion** installer from [GitHub Releases](https://github.com/Dendro-X0/ase-shield/releases) (signed when certificate is configured), or from the latest [CI artifact](https://github.com/Dendro-X0/ase-shield/actions/workflows/ci.yml) on `main`.
 2. Install and confirm the system tray icon appears — the **web dashboard** opens on first launch.
 3. Install **Anti-SE Shield** from Chrome Web Store or Microsoft Edge Add-ons (when live).
 4. Complete onboarding → **Practice** → confirm a row on `http://127.0.0.1:47123/`.

@@ -4,40 +4,19 @@ Chrome Web Store and Microsoft Edge Add-ons require a **stable public URL** for 
 
 ---
 
-## Requirements
+## Live URL (automated)
 
-| Requirement | Detail |
-|-------------|--------|
-| HTTPS | Required for store dashboards |
-| Stable | Same URL across extension updates |
-| Public | No login wall |
-| Match content | Must reflect actual product behavior |
+**Privacy policy:** https://dendro-x0.github.io/ase-shield/privacy.html
 
----
+Deployed automatically on every push to `main` by the **deploy-pages** job in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
 
-## Options (pick one)
+### One-time setup (already done if Pages source = GitHub Actions)
 
-### Option A — GitHub Pages (recommended for OSS)
+1. Repo **Settings → Pages → Build and deployment → Source:** **GitHub Actions**
+2. Push to `main` (or run **Actions → CI → Run workflow**)
+3. Open the privacy URL in an incognito window to confirm
 
-1. Enable GitHub Pages via **Settings → Pages → Source: GitHub Actions**.
-2. Push updates to `docs/privacy.html` — workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes it.
-3. Use `https://<org>.github.io/<repo>/privacy.html` in store listings.
-
-Static file in repo: [`docs/privacy.html`](../privacy.html) (mirrors [PRIVACY.md](../PRIVACY.md)).
-
-### Option B — Raw GitHub link (quick test only)
-
-Some reviewers accept:
-
-```
-https://github.com/<org>/<repo>/blob/main/docs/PRIVACY.md
-```
-
-Prefer a rendered HTML page for production submission.
-
-### Option C — Project website
-
-If you have `anti-se.example.com`, host `PRIVACY.md` content at `/privacy`.
+Canonical constants in code: `packages/core/src/repo.ts` (`PRIVACY_POLICY_URL`).
 
 ---
 
@@ -46,23 +25,15 @@ If you have `anti-se.example.com`, host `PRIVACY.md` content at `/privacy`.
 - [ ] URL loads in incognito without authentication
 - [ ] States **no user data collection** and localhost companion IPC
 - [ ] Lists permissions at high level (matches [PRIVACY.md](../PRIVACY.md))
-- [ ] Contact method for privacy questions (email or GitHub issues)
-- [ ] URL entered identically in Chrome and Edge dashboards
+- [ ] URL entered identically in Chrome and Edge store dashboards
 
 ---
 
-## After hosting
+## Store listing fields
 
-Update these files with the live URL:
+| Field | Value |
+|-------|-------|
+| Privacy policy URL | `https://dendro-x0.github.io/ase-shield/privacy.html` |
+| Repository | `https://github.com/Dendro-X0/ase-shield` |
 
-- [store/CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md) — Privacy policy URL field
-- [store/EDGE_ADDONS.md](./EDGE_ADDONS.md) — Privacy policy URL field
-- Extension store listing (developer dashboards)
-
-**Placeholder until live:**
-
-```
-PRIVACY_POLICY_URL=https://YOUR_HOSTED_URL/privacy
-```
-
-Store in maintainer notes; do not commit secrets.
+Update [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md) and [EDGE_ADDONS.md](./EDGE_ADDONS.md) when submitting.

@@ -1,5 +1,6 @@
 export * from './dev-lab.js';
 export * from './dashboard.js';
+export * from './repo.js';
 export * from './ship.js';
 export * from './analysis.js';
 export * from './engine.js';

@@ -12,7 +12,7 @@ Update checkboxes as work completes.
 
 ### Distribution
 
-- [ ] Privacy policy hosted at stable HTTPS URL *(static page: `docs/privacy.html`; enable [Pages workflow](../.github/workflows/pages.yml))*
+- [ ] Privacy policy hosted at stable HTTPS URL — **https://dendro-x0.github.io/ase-shield/privacy.html** (auto-deployed by CI on push to `main`)
 - [x] Extension zip built (`pnpm package:extension`)
 - [ ] Chrome Web Store submitted
 - [ ] Chrome Web Store approved / live

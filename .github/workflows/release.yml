@@ -65,12 +65,17 @@ jobs:
         run: pnpm --filter @ase/companion tauri:build
 
       - name: Sign installer (optional)
-        if: ${{ secrets.WINDOWS_CERTIFICATE != '' }}
+        continue-on-error: true
         shell: pwsh
         env:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-        run: ./scripts/sign-installer.ps1
+        run: |
+          if (-not $env:WINDOWS_CERTIFICATE) {
+            Write-Host "WINDOWS_CERTIFICATE not set — skipping sign step."
+            exit 0
+          }
+          ./scripts/sign-installer.ps1
 
       - name: Upload companion installer
         uses: actions/upload-artifact@v4
