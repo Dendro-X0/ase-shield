@@ -75,7 +75,7 @@ jobs:
       - name: Build companion frontend
         run: |
           pnpm install --frozen-lockfile
-          pnpm --filter @ase/core build
+          pnpm --filter @ase/core --filter @ase/rules build
           pnpm --filter @ase/companion build
 
       - name: Cargo check
