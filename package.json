@@ -7,7 +7,7 @@
   "scripts": {
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck",
+    "typecheck": "pnpm --filter @ase/core --filter @ase/rules build && pnpm -r run typecheck",
     "test": "pnpm --filter @ase/core build && pnpm --filter @ase/core --filter @ase/rules run test",
     "dev:extension": "pnpm --filter @ase/extension dev",
     "dev:companion": "pnpm --filter @ase/companion tauri:dev",
