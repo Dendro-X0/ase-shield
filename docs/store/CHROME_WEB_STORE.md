@@ -1,6 +1,6 @@
 # Chrome Web Store listing — Anti-SE Shield
 
-Use this checklist when submitting **Anti-SE Shield** extension v`1.0.0-beta.1`.
+Use this checklist when submitting **Anti-SE Shield** extension v`1.0.0-beta.2`.
 
 ## Listing copy
 

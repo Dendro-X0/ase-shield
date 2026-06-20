@@ -3,7 +3,7 @@ import { defineManifest } from '@crxjs/vite-plugin';
 export default defineManifest({
   manifest_version: 3,
   name: 'Anti-SE Shield',
-  version: '1.0.0-beta.1',
+  version: '1.0.0-beta.2',
   description:
     'Local-first protection against freelance and B2B scam patterns. No data leaves your device.',
   permissions: ['storage', 'downloads', 'management'],

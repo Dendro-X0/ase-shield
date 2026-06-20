@@ -42,7 +42,7 @@ Local-first protection for freelancers, B2B professionals, and e-commerce operat
 
 ## Status
 
-**Public beta (M8)** — `1.0.0-beta.1`: extension + Windows companion, onboarding, practice mode, store-ready privacy docs.
+**Public beta** — `1.0.0-beta.2`: [Latest release](https://github.com/Dendro-X0/ase-shield/releases/latest) · CI green · store listing after dashboard UX pass.
 
 **Next:** [Phase 1 — Ship-ready](docs/phases/PHASE_1_SHIP.md) (store listings, signed installer, consumer install path). Full schedule: [PRODUCT_ROADMAP.md](docs/PRODUCT_ROADMAP.md).
 

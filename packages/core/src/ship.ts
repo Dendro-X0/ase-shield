@@ -1,12 +1,17 @@
 import { DASHBOARD_URL } from './dashboard.js';
-import { COMPANION_DOWNLOAD_URL, PRIVACY_POLICY_URL } from './repo.js';
+import { COMPANION_DOWNLOAD_URL, EXTENSION_DOWNLOAD_URL, PRIVACY_POLICY_URL } from './repo.js';
 
 export {
   COMPANION_DOWNLOAD_URL,
+  EXTENSION_DOWNLOAD_URL,
+  GITHUB_CI_URL,
   GITHUB_REPO,
   GITHUB_PAGES_BASE,
+  GITHUB_RELEASES_URL,
+  GITHUB_RELEASE_LATEST_URL,
   GITHUB_ISSUES_URL,
   PRIVACY_POLICY_URL,
+  RELEASE_VERSION,
 } from './repo.js';
 
 /** Update when Chrome Web Store listing is approved. */
@@ -45,10 +50,11 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     title: 'Install the extension',
-    body: 'You installed from the browser store or a developer build. Keep the extension pinned for quick status checks. On Gmail, LinkedIn, and Upwork, a badge appears on conversations when patterns look risky.',
+    body: 'Install from GitHub Releases (zip) until the browser store listing is live. Keep the extension pinned. On Gmail, LinkedIn, and Upwork, a badge appears when patterns look risky.',
     links: [
-      { label: 'Chrome Web Store', href: CHROME_WEB_STORE_LISTING_URL, external: true },
-      { label: 'Microsoft Edge Add-ons', href: EDGE_ADDONS_LISTING_URL, external: true },
+      { label: 'Download extension (zip)', href: EXTENSION_DOWNLOAD_URL, external: true },
+      { label: 'Chrome Web Store (coming soon)', href: CHROME_WEB_STORE_LISTING_URL, external: true },
+      { label: 'Microsoft Edge Add-ons (coming soon)', href: EDGE_ADDONS_LISTING_URL, external: true },
     ],
   },
   {

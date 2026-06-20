@@ -258,7 +258,7 @@ git push origin v1.0.0
 
 ### CI release workflow
 
-Push tag `v*` to trigger [.github/workflows/release.yml](../../.github/workflows/release.yml) (packages extension zip; companion build when signing secrets configured).
+Push tag `v*` to trigger [.github/workflows/release.yml](../../.github/workflows/release.yml). Release notes template: [docs/releases/v1.0.0-beta.2.md](../releases/v1.0.0-beta.2.md).
 
 ---
 

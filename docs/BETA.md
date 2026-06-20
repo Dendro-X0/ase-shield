@@ -1,20 +1,28 @@
-# Public beta — Anti-SE Shield 1.0.0-beta.1
+# Public beta — Anti-SE Shield 1.0.0-beta.2
 
-Welcome to the first public beta. This release completes roadmap milestones M0–M8: extension MVP through recovery kit, plus beta packaging and onboarding.
+Welcome to the public beta. See [releases/v1.0.0-beta.2.md](releases/v1.0.0-beta.2.md) for GitHub Release notes.
 
 ## What’s included
 
-- **Extension** `1.0.0-beta.1` — scam pattern analysis, link guard, incident export, onboarding tutorial, practice mode, feedback export
-- **Companion** `1.0.0-beta.1` — quarantine, safe open, remote session guard, recovery wizard (Windows 10/11)
+- **Extension** `1.0.0-beta.2` — scam pattern analysis, link guard, incident export, onboarding, practice mode, Dev Lab, feedback export
+- **Companion** `1.0.0-beta.2` — quarantine, safe open, remote session guard, recovery wizard, web dashboard (Windows 10/11)
 
-## Install (developers / early testers)
+## Install (early testers)
 
-### Consumer path (Phase 1 target)
+### Recommended — GitHub Release
 
-1. Download **Anti-SE Companion** installer from [GitHub Releases](https://github.com/Dendro-X0/ase-shield/releases) (signed when certificate is configured), or from the latest [CI artifact](https://github.com/Dendro-X0/ase-shield/actions/workflows/ci.yml) on `main`.
-2. Install and confirm the system tray icon appears — the **web dashboard** opens on first launch.
-3. Install **Anti-SE Shield** from Chrome Web Store or Microsoft Edge Add-ons (when live).
-4. Complete onboarding → **Practice** → confirm a row on `http://127.0.0.1:47123/`.
+1. Open **[Latest release](https://github.com/Dendro-X0/ase-shield/releases/latest)**
+2. Download **Anti-SE Companion** `.exe` → install → confirm tray icon (dashboard opens on first launch)
+3. Download **extension zip** → unzip → Chrome/Edge → Developer mode → **Load unpacked**
+4. Complete onboarding → **Practice** → confirm a row on http://127.0.0.1:47123/
+
+Privacy policy: https://dendro-x0.github.io/ase-shield/privacy.html
+
+**Note:** Installer is unsigned in this beta (SmartScreen warning expected). Browser store listing deferred until dashboard UX pass.
+
+### CI artifacts (alternative)
+
+Latest green build on [`main`](https://github.com/Dendro-X0/ase-shield/actions/workflows/ci.yml): download **extension-zip** and **companion-installer** artifacts.
 
 ### Sideload (developers)
 

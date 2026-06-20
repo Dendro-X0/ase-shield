@@ -1,6 +1,6 @@
 [package]
 name = "ase-companion"
-version = "1.0.0-beta.1"
+version = "1.0.0-beta.2"
 description = "Anti-SE desktop companion (Windows Phase 2 shell)"
 authors = ["Anti-SE"]
 edition = "2021"
